@@ -23,6 +23,7 @@
 }
 
 /* Dark Mode - Modern Professional Palette */
+html.dark-mode,
 body.dark-mode {
     --primary-color: #60a5fa;
     --primary-dark: #3b82f6;
@@ -40,6 +41,8 @@ body.dark-mode {
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
 }
 
+html.dark-mode,
+html.dark-mode body,
 body.dark-mode {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     color: #f1f5f9;

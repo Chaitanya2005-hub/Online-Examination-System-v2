@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Student Management System</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <script th:src="@{/js/theme-toggle.js}"></script>
     <style>
         .role-specific {
             display: none;
@@ -15,6 +21,11 @@
     </style>
 </head>
 <body>
+    <div style="position: absolute; top: 1rem; right: 1rem; z-index: 10;">
+        <button id="themeToggle" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;" onclick="toggleTheme()">
+            🌙
+        </button>
+    </div>
     <div class="login-container">
         <div class="login-card">
             <h2>Create Account</h2>

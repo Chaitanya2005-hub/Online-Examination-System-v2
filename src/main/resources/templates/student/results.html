@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Results</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <script th:src="@{/js/theme-toggle.js}"></script>
 </head>
 <body class="theme-student">
     <header>
@@ -13,6 +19,9 @@
             <nav class="nav-links">
                 <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
                 <a th:href="@{/student/dashboard}">Dashboard</a>
+                <button id="themeToggle" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;" onclick="toggleTheme()">
+                    🌙
+                </button>
                 <form th:action="@{/logout}" method="post" style="display: inline;">
                     <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
                 </form>
