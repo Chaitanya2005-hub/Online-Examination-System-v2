@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme-toggle.js}"></script>
+</head>
+<body class="theme-teacher">
+    <header>
+        <div class="container header-content">
+            <a th:href="@{/teacher/dashboard}" class="logo">Student Management System</a>
+            <nav class="nav-links">
+                <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
+                <a th:href="@{/teacher/dashboard}">Dashboard</a>
+                <a th:href="@{/teacher/profile}">Profile</a>
+                <button id="themeToggle" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;" onclick="toggleTheme()">
+                    🌙
+                </button>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container" style="padding-top: 2rem;">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Teacher Dashboard</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Welcome back, <span th:text="${user.fullName}"></span></p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">Active</div>
+                <div class="stat-label">Status</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" th:text="${user.department}">CSE</div>
+                <div class="stat-label">Department</div>
+            </div>
+        </div>
+        
+        <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Quick Actions</h2>
+        <div class="dashboard-grid">
+            <a th:href="@{/teacher/manage-exams}" class="dashboard-card">
+                <div class="icon">🎯</div>
+                <h3>Manage Exams</h3>
+                <p>Create and manage exams</p>
+            </a>
+            <a th:href="@{/teacher/upload-questions}" class="dashboard-card">
+                <div class="icon">📝</div>
+                <h3>Upload Questions</h3>
+                <p>Add questions to question bank</p>
+            </a>
+            <a th:href="@{/teacher/manage-questions}" class="dashboard-card">
+                <div class="icon">📚</div>
+                <h3>Manage Questions</h3>
+                <p>Edit or delete questions</p>
+            </a>
+            <a th:href="@{/teacher/mark-attendance}" class="dashboard-card">
+                <div class="icon">✅</div>
+                <h3>Mark Attendance</h3>
+                <p>Generate QR codes for attendance</p>
+            </a>
+            <a th:href="@{/teacher/exam-results}" class="dashboard-card">
+                <div class="icon">📊</div>
+                <h3>Exam Results</h3>
+                <p>View student exam results</p>
+            </a>
+            <a th:href="@{/teacher/assignments}" class="dashboard-card">
+                <div class="icon">📋</div>
+                <h3>Assignments</h3>
+                <p>Create and manage assignments</p>
+            </a>
+            <a th:href="@{/teacher/student-progress}" class="dashboard-card">
+                <div class="icon">📈</div>
+                <h3>Student Progress</h3>
+                <p>Track student performance</p>
+            </a>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

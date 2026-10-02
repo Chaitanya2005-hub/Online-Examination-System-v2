@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Exam</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .exam-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .warning-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(197, 48, 48, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .warning-overlay.active {
+            display: flex;
+        }
+        
+        .warning-content {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .warning-content h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="theme-student" onblur="handleFocusLoss()">
+    <div class="warning-overlay" id="warningOverlay">
+        <div class="warning-content">
+            <h2>⚠️ WARNING</h2>
+            <p id="warningText">You switched tabs/windows!</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">Please return to the exam immediately.</p>
+        </div>
+    </div>
+    
+    <div class="exam-container" style="padding-top: 2rem;">
+        <div class="exam-timer">
+            Time Remaining: <span id="timer">00:00:00</span>
+        </div>
+        
+        <form th:action="@{/student/exam/{id}/submit(id=${exam.id})}" method="post" id="examForm">
+            <div th:each="question, stat : ${questions}" class="question-card">
+                <div class="question-text">
+                    <span th:text="${stat.index + 1}">1</span>. <span th:text="${question.questionText}">Question text</span>
+                </div>
+                
+                <ul class="options-list">
+                    <li class="option-item">
+                        <label>
+                            <input type="radio" th:name="'answers[' + ${stat.index} + ']'" th:value="0" required>
+                            <span th:text="${question.optionA}">Option A</span>
+                        </label>
+                    </li>
+                    <li class="option-item">
+                        <label>
+                            <input type="radio" th:name="'answers[' + ${stat.index} + ']'" th:value="1">
+                            <span th:text="${question.optionB}">Option B</span>
+                        </label>
+                    </li>
+                    <li class="option-item">
+                        <label>
+                            <input type="radio" th:name="'answers[' + ${stat.index} + ']'" th:value="2">
+                            <span th:text="${question.optionC}">Option C</span>
+                        </label>
+                    </li>
+                    <li class="option-item">
+                        <label>
+                            <input type="radio" th:name="'answers[' + ${stat.index} + ']'" th:value="3">
+                            <span th:text="${question.optionD}">Option D</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="exam-navigation">
+                <button type="submit" class="btn btn-success">Submit Exam</button>
+            </div>
+        </form>
+    </div>
+    
+    <script th:inline="javascript">
+        let warningCount = 0;
+        const MAX_WARNINGS = 3;
+        let timerInterval;
+        
+        // Timer countdown
+        const duration = [[${exam.durationMinutes}]] * 60; // Convert to seconds
+        let timeLeft = duration;
+        
+        function updateTimer() {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            
+            document.getElementById('timer').textContent = 
+                String(hours).padStart(2, '0') + ':' + 
+                String(minutes).padStart(2, '0') + ':' + 
+                String(seconds).padStart(2, '0');
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('examForm').submit();
+            }
+            timeLeft--;
+        }
+        
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+        
+        // Anti-cheating: Focus loss detection
+        function handleFocusLoss() {
+            warningCount++;
+            
+            if (warningCount >= MAX_WARNINGS) {
+                // Auto-submit exam
+                document.getElementById('warningText').textContent = 
+                    'Maximum warnings reached. Your exam is being submitted automatically.';
+                document.getElementById('warningOverlay').classList.add('active');
+                setTimeout(() => {
+                    document.getElementById('examForm').submit();
+                }, 3000);
+            } else {
+                // Show warning
+                document.getElementById('warningText').textContent = 
+                    'WARNING ' + warningCount + '/' + MAX_WARNINGS + ': You switched tabs/windows!';
+                document.getElementById('warningOverlay').classList.add('active');
+                
+                setTimeout(() => {
+                    document.getElementById('warningOverlay').classList.remove('active');
+                }, 2000);
+            }
+        }
+        
+        // Prevent right-click
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            alert('Right-click is disabled during the exam.');
+        });
+        
+        // Prevent keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'c' || e.key === 'v' || e.key === 't' || e.key === 'w') {
+                    e.preventDefault();
+                    alert('Keyboard shortcuts are disabled during the exam.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

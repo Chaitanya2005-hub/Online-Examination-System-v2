@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grievances</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="theme-student">
+    <header>
+        <div class="container header-content">
+            <a th:href="@{/student/dashboard}" class="logo">Student Management System</a>
+            <nav class="nav-links">
+                <span th:text="'Welcome, ' + ${user.fullName}"></span>
+                <a th:href="@{/student/dashboard}">Dashboard</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container" style="padding-top: 2rem;">
+        <h1 style="margin-bottom: 2rem;">Grievances</h1>
+        
+        <div class="card" style="max-width: 600px; margin: 0 auto; margin-bottom: 2rem;">
+            <div class="card-header">
+                <h3>Submit New Grievance</h3>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/student/grievances/submit}" method="post">
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category" class="form-control" required>
+                            <option value="">Select Category</option>
+                            <option value="Academic">Academic</option>
+                            <option value="Administrative">Administrative</option>
+                            <option value="Infrastructure">Infrastructure</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" class="form-control" rows="5" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Grievance</button>
+                </form>
+            </div>
+        </div>
+        
+        <h2 style="margin-bottom: 1rem;">Your Grievances</h2>
+        
+        <div th:if="${grievances != null and !grievances.empty}">
+            <div class="card" th:each="grievance : ${grievances}">
+                <div class="card-body">
+                    <p><strong>Category:</strong> <span th:text="${grievance.category}"></span></p>
+                    <p><strong>Description:</strong> <span th:text="${grievance.description}"></span></p>
+                    <p><strong>Status:</strong> 
+                        <span th:if="${grievance.status == T(com.stark.studentmanagement.entity.Grievance.GrievanceStatus).PENDING}" 
+                              style="color: var(--warning-color); font-weight: 600;">Pending</span>
+                        <span th:if="${grievance.status == T(com.stark.studentmanagement.entity.Grievance.GrievanceStatus).RESOLVED}" 
+                              style="color: var(--success-color); font-weight: 600;">Resolved</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${grievances == null or grievances.empty}">
+            <div class="card">
+                <div class="card-body">
+                    <p style="text-align: center; color: var(--text-light);">No grievances submitted yet.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

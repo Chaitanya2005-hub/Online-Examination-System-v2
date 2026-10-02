@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fee Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="theme-admin">
+    <header>
+        <div class="container header-content">
+            <a th:href="@{/admin/dashboard}" class="logo">Student Management System</a>
+            <nav class="nav-links">
+                <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
+                <a th:href="@{/admin/dashboard}">Dashboard</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container" style="padding-top: 2rem;">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Fee Management</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Track and update fee payments</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>Pending Fees</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Total Amount</th>
+                            <th>Paid Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="fee : ${fees}">
+                            <td th:text="${fee.student?.fullName}"></td>
+                            <td th:text="${fee.totalAmount}"></td>
+                            <td th:text="${fee.paidAmount}"></td>
+                            <td th:text="${fee.status}"></td>
+                            <td>
+                                <form th:action="@{/admin/admin-fees/{studentId}(studentId=${fee.student?.id})}" method="post" style="display: inline;">
+                                    <input type="number" name="amount" placeholder="Amount" class="form-control" style="padding: 0.25rem; font-size: 0.85rem; width: 100px; display: inline;">
+                                    <button type="submit" class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.85rem; margin-left: 0.5rem;">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

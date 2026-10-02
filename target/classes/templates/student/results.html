@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="theme-student">
+    <header>
+        <div class="container header-content">
+            <a th:href="@{/student/dashboard}" class="logo">Student Management System</a>
+            <nav class="nav-links">
+                <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
+                <a th:href="@{/student/dashboard}">Dashboard</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container" style="padding-top: 2rem;">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Exam Results</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">View your exam performance</p>
+        </div>
+        
+        <div th:if="${results != null and !results.empty}">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Exam</th>
+                        <th>Score</th>
+                        <th>Total Marks</th>
+                        <th>Percentage</th>
+                        <th>Status</th>
+                        <th>Security Warnings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="result : ${results}">
+                        <td th:text="${result.exam.title}">Exam Title</td>
+                        <td th:text="${result.score}">Score</td>
+                        <td th:text="${result.totalMarks}">Total</td>
+                        <td th:text="${#numbers.formatPercent(result.score * 1.0 / result.totalMarks, 1, 1)}">Percentage</td>
+                        <td th:text="${result.status}">Status</td>
+                        <td th:text="${result.securityWarnings}">Warnings</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div th:if="${results == null or results.empty}">
+            <div class="card">
+                <div class="card-body">
+                    <p style="text-align: center; color: var(--text-light); font-size: 0.9rem;">No results available yet.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

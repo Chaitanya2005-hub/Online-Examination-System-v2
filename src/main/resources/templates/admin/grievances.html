@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Grievances</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="theme-admin">
+    <header>
+        <div class="container header-content">
+            <a th:href="@{/admin/dashboard}" class="logo">Student Management System</a>
+            <nav class="nav-links">
+                <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
+                <a th:href="@{/admin/dashboard}">Dashboard</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container" style="padding-top: 2rem;">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Manage Grievances</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Resolve student grievances</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>Pending Grievances</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="grievance : ${grievances}">
+                            <td th:text="${grievance.student?.fullName}"></td>
+                            <td th:text="${grievance.category}"></td>
+                            <td th:text="${grievance.description}"></td>
+                            <td th:text="${grievance.status}"></td>
+                            <td>
+                                <a th:href="@{/admin/grievances/{id}/resolve(id=${grievance.id})}" class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;">Resolve</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

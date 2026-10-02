@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Exam</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme-toggle.js}"></script>
+</head>
+<body class="theme-teacher">
+    <header>
+        <div class="container header-content">
+            <a th:href="@{/teacher/dashboard}" class="logo">Student Management System</a>
+            <nav class="nav-links">
+                <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
+                <a th:href="@{/teacher/dashboard}">Dashboard</a>
+                <button id="themeToggle" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;" onclick="toggleTheme()">
+                    🌙
+                </button>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container" style="padding-top: 2rem;">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Edit Exam</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Update exam details</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>Edit Exam</h3>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/teacher/manage-exams/edit/{id}(id=${exam.id})}" method="post" th:object="${exam}">
+                    <div class="form-group">
+                        <label for="title">Exam Title</label>
+                        <input type="text" id="title" th:field="*{title}" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <select id="subject" th:field="*{subject}" class="form-control" required>
+                            <option value="">Select Subject</option>
+                            <option th:each="subject : ${subjects}" th:value="${subject.id}" th:text="${subject.name}"></option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="examDate">Exam Date</label>
+                        <input type="date" id="examDate" th:field="*{examDate}" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="startTime">Start Time</label>
+                        <input type="time" id="startTime" th:field="*{startTime}" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="durationMinutes">Duration (minutes)</label>
+                        <input type="number" id="durationMinutes" th:field="*{durationMinutes}" class="form-control" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" th:field="*{status}" class="form-control" required>
+                            <option value="SCHEDULED">Scheduled</option>
+                            <option value="ONGOING">Ongoing</option>
+                            <option value="COMPLETED">Completed</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Update Exam</button>
+                    <a th:href="@{/teacher/manage-exams}" class="btn btn-outline" style="margin-left: 0.5rem;">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

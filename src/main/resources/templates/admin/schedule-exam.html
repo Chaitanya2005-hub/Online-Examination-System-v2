@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Exam</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="theme-admin">
+    <header>
+        <div class="container header-content">
+            <a th:href="@{/admin/dashboard}" class="logo">Student Management System</a>
+            <nav class="nav-links">
+                <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
+                <a th:href="@{/admin/dashboard}">Dashboard</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container" style="padding-top: 2rem;">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Schedule Exam</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Create and schedule examinations</p>
+        </div>
+        
+        <div class="card" style="max-width: 600px;">
+            <div class="card-header">
+                <h3>New Exam</h3>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/admin/schedule-exam}" method="post" th:object="${exam}">
+                    <div class="form-group">
+                        <label for="title">Exam Title</label>
+                        <input type="text" id="title" th:field="*{title}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="examDate">Exam Date</label>
+                        <input type="date" id="examDate" th:field="*{examDate}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="startTime">Start Time</label>
+                        <input type="time" id="startTime" th:field="*{startTime}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="durationMinutes">Duration (minutes)</label>
+                        <input type="number" id="durationMinutes" th:field="*{durationMinutes}" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Schedule Exam</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

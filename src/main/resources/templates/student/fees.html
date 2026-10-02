@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fee Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="theme-student">
+    <header>
+        <div class="container header-content">
+            <a th:href="@{/student/dashboard}" class="logo">Student Management System</a>
+            <nav class="nav-links">
+                <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
+                <a th:href="@{/student/dashboard}">Dashboard</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container" style="padding-top: 2rem;">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Fee Details</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Check fee payment status</p>
+        </div>
+        
+        <div th:if="${fee != null}">
+            <div class="card" style="max-width: 600px; margin: 0 auto;">
+                <div class="card-header">
+                    <h3>Fee Status</h3>
+                </div>
+                <div class="card-body">
+                    <p style="margin-bottom: 0.5rem;"><strong>Total Amount:</strong> ₹<span th:text="${fee.totalAmount}">50000</span></p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Paid Amount:</strong> ₹<span th:text="${fee.paidAmount}">0</span></p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Remaining:</strong> ₹<span th:text="${fee.totalAmount - fee.paidAmount}">50000</span></p>
+                    <p style="margin-bottom: 1rem;"><strong>Status:</strong> 
+                        <span th:if="${fee.status == T(com.stark.studentmanagement.entity.Fee.FeeStatus).PAID}" 
+                              style="color: var(--success-color); font-weight: 600;">Paid</span>
+                        <span th:if="${fee.status == T(com.stark.studentmanagement.entity.Fee.FeeStatus).PENDING}" 
+                              style="color: var(--danger-color); font-weight: 600;">Pending</span>
+                        <span th:if="${fee.status == T(com.stark.studentmanagement.entity.Fee.FeeStatus).PARTIAL}" 
+                              style="color: var(--warning-color); font-weight: 600;">Partial</span>
+                    </p>
+                    
+                    <div th:if="${fee.status != T(com.stark.studentmanagement.entity.Fee.FeeStatus).PAID}" 
+                         style="margin-top: 1.5rem;">
+                        <p style="color: var(--text-light); font-size: 0.9rem;">Please contact the administration to pay your fees.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${fee == null}">
+            <div class="card">
+                <div class="card-body">
+                    <p style="text-align: center; color: var(--text-light); font-size: 0.9rem;">Fee information not available.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

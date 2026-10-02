@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/theme-toggle.js}"></script>
+</head>
+<body class="theme-teacher">
+    <header>
+        <div class="container header-content">
+            <a th:href="@{/teacher/dashboard}" class="logo">Student Management System</a>
+            <nav class="nav-links">
+                <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
+                <a th:href="@{/teacher/dashboard}">Dashboard</a>
+                <button id="themeToggle" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;" onclick="toggleTheme()">
+                    🌙
+                </button>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem 1rem;">Logout</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container" style="padding-top: 2rem;">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Exam Results</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">View student exam results</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>Available Exams</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Exam Title</th>
+                            <th>Date</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="exam : ${exams}">
+                            <td th:text="${exam.title}"></td>
+                            <td th:text="${exam.examDate}"></td>
+                            <td th:text="${exam.durationMinutes + ' minutes'}"></td>
+                            <td th:text="${exam.status}"></td>
+                            <td>
+                                <a th:href="@{/teacher/exam-results/{id}(id=${exam.id})}" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;">View Results</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Student Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
