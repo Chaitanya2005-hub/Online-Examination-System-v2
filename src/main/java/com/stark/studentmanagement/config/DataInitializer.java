@@ -25,22 +25,22 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (userRepository.count() == 0) {
-            String encodedPass = passwordEncoder.encode("password123");
+            String encodedPass = passwordEncoder.encode("123");
 
             // Seed Admin
             User admin = new User();
-            admin.setUsername("admin");
+            admin.setUsername("stark");
             admin.setPassword(encodedPass);
-            admin.setFullName("System Administrator");
+            admin.setFullName("Tony Stark (Admin)");
             admin.setRole(User.Role.ADMIN);
             admin.setErpId("ADM001");
             userRepository.save(admin);
 
-            // Seed Teacher
+            // Seed Teacher / Faculty
             User teacher = new User();
-            teacher.setUsername("teacher");
+            teacher.setUsername("bruce");
             teacher.setPassword(encodedPass);
-            teacher.setFullName("Prof. John Doe");
+            teacher.setFullName("Prof. Bruce Banner");
             teacher.setRole(User.Role.TEACHER);
             teacher.setDepartment("CSE");
             teacher.setErpId("TCH001");
@@ -48,14 +48,14 @@ public class DataInitializer implements CommandLineRunner {
 
             // Seed Student
             User student = new User();
-            student.setUsername("student");
+            student.setUsername("241801120002");
             student.setPassword(encodedPass);
-            student.setFullName("Alice Smith");
+            student.setFullName("Student 241801120002");
             student.setRole(User.Role.STUDENT);
             student.setDepartment("CSE");
             student.setYear(3);
             student.setSection("A");
-            student.setErpId("STD001");
+            student.setErpId("241801120002");
             userRepository.save(student);
 
             // Seed Subject
