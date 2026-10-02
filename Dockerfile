@@ -8,8 +8,8 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY src ./src
 
-# Build production JAR
-RUN ./mvnw clean package -DskipTests
+# Make wrapper executable and build production JAR using Maven
+RUN chmod +x ./mvnw && mvn clean package -DskipTests
 
 # Step 2: Create lightweight runtime container with Java 21 JRE
 FROM eclipse-temurin:21-jre-alpine
