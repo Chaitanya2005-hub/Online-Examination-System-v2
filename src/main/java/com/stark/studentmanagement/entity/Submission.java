@@ -26,7 +26,8 @@ public class Submission {
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
     
-    @Column(name = "submission_text", columnDefinition = "TEXT")
+    @Lob
+    @Column(name = "submission_text", length = 5000)
     private String submissionText;
     
     @Column(name = "submitted_date")
