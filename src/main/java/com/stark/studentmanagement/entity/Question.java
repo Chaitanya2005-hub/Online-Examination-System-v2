@@ -20,8 +20,7 @@ public class Question {
     @JoinColumn(name = "exam_id", nullable = false)
     private Exam exam;
     
-    @Lob
-    @Column(name = "question_text", nullable = false, length = 5000)
+    @Column(name = "question_text", nullable = false, columnDefinition = "TEXT")
     private String questionText;
     
     @Column(name = "option_a")

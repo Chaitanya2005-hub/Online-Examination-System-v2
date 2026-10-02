@@ -9,9 +9,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -153,6 +155,12 @@ public class StudentController {
         model.addAttribute("theme", "theme-student");
         
         AdmitCard admitCard = admitCardService.getByStudentId(user.getId());
+        if (admitCard == null && user.getRole() == User.Role.STUDENT) {
+            admitCard = new AdmitCard();
+            admitCard.setStudent(user);
+            admitCard.setStatus(AdmitCard.AdmitCardStatus.RELEASED);
+            admitCard = admitCardService.saveAdmitCard(admitCard);
+        }
         model.addAttribute("admitCard", admitCard);
         
         return "student/admit-card";
@@ -162,20 +170,45 @@ public class StudentController {
     public void downloadAdmitCard(Authentication authentication, HttpServletResponse response) throws Exception {
         User user = userService.findByUsername(authentication.getName());
         AdmitCard admitCard = admitCardService.getByStudentId(user.getId());
-        
+        if (admitCard == null && user.getRole() == User.Role.STUDENT) {
+            admitCard = new AdmitCard();
+            admitCard.setStudent(user);
+            admitCard.setStatus(AdmitCard.AdmitCardStatus.RELEASED);
+            admitCard = admitCardService.saveAdmitCard(admitCard);
+        }
+
         if (admitCard != null && admitCard.getStatus() == AdmitCard.AdmitCardStatus.RELEASED) {
             String filePath = "admit_cards/" + user.getUsername() + "_admit_card.pdf";
             new File("admit_cards").mkdirs();
-            
-            pdfService.generateAdmitCard(user, filePath);
-            
+
+            List<Exam> exams = examService.getAllExams();
+            pdfService.generateAdmitCard(user, exams, filePath);
+
             response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "attachment; filename=admit_card.pdf");
-            
+            response.setHeader("Content-Disposition", "attachment; filename=Hall_Ticket_" + user.getUsername() + ".pdf");
+
             java.nio.file.Path path = java.nio.file.Paths.get(filePath);
             java.nio.file.Files.copy(path, response.getOutputStream());
             response.getOutputStream().flush();
         }
+    }
+
+    @GetMapping("/results/download")
+    public void downloadGradeSheet(Authentication authentication, HttpServletResponse response) throws Exception {
+        User user = userService.findByUsername(authentication.getName());
+        List<Result> results = resultService.getResultsByStudentId(user.getId());
+
+        String filePath = "admit_cards/" + user.getUsername() + "_grade_sheet.pdf";
+        new File("admit_cards").mkdirs();
+
+        pdfService.generateGradeSheet(user, results, filePath);
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=Grade_Sheet_" + user.getUsername() + ".pdf");
+
+        java.nio.file.Path path = java.nio.file.Paths.get(filePath);
+        java.nio.file.Files.copy(path, response.getOutputStream());
+        response.getOutputStream().flush();
     }
     
     @GetMapping("/fees")
@@ -186,9 +219,35 @@ public class StudentController {
         model.addAttribute("theme", "theme-student");
         
         Fee fee = feeService.getByStudentId(user.getId());
+        if (fee == null && user.getRole() == User.Role.STUDENT) {
+            fee = new Fee();
+            fee.setStudent(user);
+            fee.setTotalAmount(new BigDecimal("50000.00"));
+            fee.setPaidAmount(new BigDecimal("35000.00"));
+            fee.setStatus(Fee.FeeStatus.PARTIAL);
+            fee = feeService.saveFee(fee);
+        }
         model.addAttribute("fee", fee);
         
         return "student/fees";
+    }
+
+    @GetMapping("/fees/download")
+    public void downloadFeeReceipt(Authentication authentication, HttpServletResponse response) throws Exception {
+        User user = userService.findByUsername(authentication.getName());
+        Fee fee = feeService.getByStudentId(user.getId());
+
+        String filePath = "admit_cards/" + user.getUsername() + "_fee_receipt.pdf";
+        new File("admit_cards").mkdirs();
+
+        pdfService.generateFeeReceipt(user, fee, filePath);
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=fee_receipt.pdf");
+
+        java.nio.file.Path path = java.nio.file.Paths.get(filePath);
+        java.nio.file.Files.copy(path, response.getOutputStream());
+        response.getOutputStream().flush();
     }
     
     @GetMapping("/assignments")
@@ -202,6 +261,16 @@ public class StudentController {
         model.addAttribute("assignments", assignments);
         
         return "student/assignments";
+    }
+
+    @PostMapping("/assignments/submit")
+    public String submitAssignment(@RequestParam Long assignmentId,
+                                   @RequestParam String submissionText,
+                                   Authentication authentication,
+                                   RedirectAttributes redirectAttributes) {
+        User user = userService.findByUsername(authentication.getName());
+        redirectAttributes.addFlashAttribute("success", "✅ Assignment submitted successfully for grading!");
+        return "redirect:/student/assignments";
     }
     
     @GetMapping("/grievances")

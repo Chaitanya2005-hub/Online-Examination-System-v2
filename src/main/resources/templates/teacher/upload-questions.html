@@ -35,9 +35,61 @@
             <p style="color: var(--text-light); font-size: 0.9rem;">Add questions to question bank</p>
         </div>
         
+        <!-- Success / Error Alert Messages -->
+        <div th:if="${success}" style="background-color: #d1e7dd; color: #0f5132; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #badbcc;">
+            <strong th:text="${success}"></strong>
+        </div>
+        <div th:if="${error}" style="background-color: #f8d7da; color: #842029; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #f5c2c7;">
+            <strong th:text="${error}"></strong>
+        </div>
+
+        <!-- AI Question Generator Card -->
+        <div class="card" style="max-width: 800px; margin: 0 auto 2rem auto; border: 2px solid #6366f1; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);">
+            <div class="card-header" style="background: linear-gradient(90deg, #4f46e5, #7c3aed); color: white;">
+                <h3 style="display: flex; align-items: center; gap: 0.5rem; color: white;">
+                    ✨ Auto-Generate Questions with Google Gemini AI
+                </h3>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/teacher/auto-generate-questions}" method="post">
+                    <div class="form-group">
+                        <label for="aiExam">Select Exam</label>
+                        <select id="aiExam" name="examId" class="form-control" required>
+                            <option value="">-- Select Exam --</option>
+                            <option th:each="exam : ${exams}" th:value="${exam.id}" th:text="${exam.title}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="count">Number of Questions to Generate</label>
+                        <input type="number" id="count" name="count" class="form-control" value="10" min="1" max="25" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="difficultyLevel">Difficulty Level</label>
+                        <select id="difficultyLevel" name="difficultyLevel" class="form-control" required>
+                            <option value="EASY">🟢 Easy (Conceptual & Definitions)</option>
+                            <option value="MEDIUM" selected>🟡 Medium (Standard Exam Level)</option>
+                            <option value="HARD">🔴 Hard (Advanced Analytical & Problem Solving)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="topicFocus">Topic / Focus Area (Optional)</label>
+                        <input type="text" id="topicFocus" name="topicFocus" class="form-control" placeholder="e.g. Automata & Grammars, Dynamic Programming, Spring MVC Controllers">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; background: linear-gradient(90deg, #4f46e5, #7c3aed); border: none; font-weight: 600;">
+                        🤖 Generate & Save Questions to Database
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Manual Add Question Form -->
         <div class="card" style="max-width: 800px; margin: 0 auto;">
             <div class="card-header">
-                <h3>Add New Question</h3>
+                <h3>Add New Question Manually</h3>
             </div>
             <div class="card-body">
                 <form th:action="@{/teacher/upload-questions}" method="post" th:object="${question}">

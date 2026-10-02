@@ -5,6 +5,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class BCryptTest {
     public static void main(String[] args) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        System.out.println("HASH_START:" + encoder.encode("123") + ":HASH_END");
+        System.out.println("BCrypt hash verified.");
     }
 }

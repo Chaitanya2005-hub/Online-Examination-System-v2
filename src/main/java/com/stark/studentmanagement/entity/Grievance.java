@@ -22,8 +22,7 @@ public class Grievance {
     
     private String category;
     
-    @Lob
-    @Column(length = 5000)
+    @Column(columnDefinition = "TEXT")
     private String description;
     
     @Enumerated(EnumType.STRING)

@@ -79,6 +79,15 @@ public class UserService {
         return userRepository.save(user);
     }
     
+    public List<User> findStudentsByFilter(String department, String section, Integer year) {
+        List<User> students = userRepository.findByRole(User.Role.STUDENT);
+        return students.stream()
+                .filter(s -> (department == null || department.isEmpty() || department.equalsIgnoreCase(s.getDepartment())))
+                .filter(s -> (section == null || section.isEmpty() || section.equalsIgnoreCase(s.getSection())))
+                .filter(s -> (year == null || year.equals(s.getYear())))
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }

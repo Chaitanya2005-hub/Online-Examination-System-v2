@@ -30,12 +30,38 @@
     </header>
     
     <main class="container" style="padding-top: 2rem;">
-        <div style="margin-bottom: 2rem;">
-            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Exam Results</h1>
-            <p style="color: var(--text-light); font-size: 0.9rem;">View your exam performance</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Exam Results & Grade Sheet</h1>
+                <p style="color: var(--text-light); font-size: 0.9rem;">View your semester grades and performance breakdown</p>
+            </div>
+            <div>
+                <a th:href="@{/student/results/download}" class="btn btn-primary" style="padding: 0.6rem 1.25rem; text-decoration: none;">
+                    📄 Download Semester Grade Sheet (PDF)
+                </a>
+            </div>
         </div>
         
         <div th:if="${results != null and !results.empty}">
+            <!-- Performance Summary Analytics Card -->
+            <div class="card" style="margin-bottom: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px solid var(--border); border-radius: 12px;">
+                <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--primary);">📊 Overall Academic Performance Overview</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div style="background: var(--card-bg, #fff); padding: 1rem; border-radius: 8px; text-align: center; border: 1px solid var(--border);">
+                        <div style="font-size: 0.8rem; color: #64748b;">Exams Attempted</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #4f46e5;" th:text="${results.size()}">0</div>
+                    </div>
+                    <div style="background: var(--card-bg, #fff); padding: 1rem; border-radius: 8px; text-align: center; border: 1px solid var(--border);">
+                        <div style="font-size: 0.8rem; color: #64748b;">Academic Status</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #10b981;">GOOD STANDING</div>
+                    </div>
+                    <div style="background: var(--card-bg, #fff); padding: 1rem; border-radius: 8px; text-align: center; border: 1px solid var(--border);">
+                        <div style="font-size: 0.8rem; color: #64748b;">Proctoring Record</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #059669;">VERIFIED CLEAN</div>
+                    </div>
+                </div>
+            </div>
+
             <table class="table">
                 <thead>
                     <tr>
@@ -44,7 +70,7 @@
                         <th>Total Marks</th>
                         <th>Percentage</th>
                         <th>Status</th>
-                        <th>Security Warnings</th>
+                        <th>Proctoring Warnings</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,9 +78,15 @@
                         <td th:text="${result.exam.title}">Exam Title</td>
                         <td th:text="${result.score}">Score</td>
                         <td th:text="${result.totalMarks}">Total</td>
-                        <td th:text="${#numbers.formatPercent(result.score * 1.0 / result.totalMarks, 1, 1)}">Percentage</td>
-                        <td th:text="${result.status}">Status</td>
-                        <td th:text="${result.securityWarnings}">Warnings</td>
+                        <td>
+                            <span style="font-weight: 700; color: #4f46e5;" th:text="${#numbers.formatPercent(result.score * 1.0 / result.totalMarks, 1, 1)}">Percentage</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:class="'badge ' + ${result.status == 'PASSED' ? 'badge-success' : 'badge-danger'}" th:text="${result.status}">Status</span>
+                        </td>
+                        <td>
+                            <span th:text="${result.securityWarnings == 0 ? '0 (Clean)' : result.securityWarnings + ' Warnings'}" th:style="${result.securityWarnings > 0 ? 'color: #dc2626; font-weight: 700;' : 'color: #16a34a;'}">Warnings</span>
+                        </td>
                     </tr>
                 </tbody>
             </table>

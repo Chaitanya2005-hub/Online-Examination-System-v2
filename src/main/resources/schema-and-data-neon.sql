@@ -148,26 +148,59 @@ CREATE TABLE live_codes (
 
 -- Insert Users
 INSERT INTO users (username, password, full_name, role, erp_id, student_year, department, section, theme_preference) VALUES
-('admin', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'System Administrator', 'ADMIN', 'ADM001', NULL, NULL, NULL, 'dark'),
-('teacher', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Prof. John Doe', 'TEACHER', 'TCH001', NULL, 'CSE', NULL, 'dark'),
-('student', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Alice Smith', 'STUDENT', 'STD001', 3, 'CSE', 'A', 'dark'),
-('bob', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Bob Johnson', 'STUDENT', 'STD002', 3, 'CSE', 'B', 'dark');
+('stark', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Tony Stark (Admin)', 'ADMIN', 'ADM001', NULL, NULL, NULL, 'dark'),
+('teacher', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Dr. Sarah Smith', 'TEACHER', 'FAC001', NULL, 'CSE', NULL, 'dark'),
+('241801120002', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'K. Sri Chaitanya', 'STUDENT', '241801120002', 2, 'CSE', 'C', 'dark'),
+('241801370001', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Pathivada Nishitha Sai', 'STUDENT', '241801370001', 2, 'AIML', 'A', 'dark'),
+('241801370002', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Shaik Subhani', 'STUDENT', '241801370002', 2, 'AIML', 'A', 'dark'),
+('241801370003', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Gudivada Vamsi', 'STUDENT', '241801370003', 2, 'AIML', 'A', 'dark'),
+('241801370004', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Netheti Tejesh', 'STUDENT', '241801370004', 2, 'AIML', 'A', 'dark'),
+('241801350003', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Rallapati Pavan Kumar', 'STUDENT', '241801350003', 2, 'CN', 'B', 'dark'),
+('241801380001', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'A. Rama Lakshmi', 'STUDENT', '241801380001', 2, 'CSD', 'B', 'dark'),
+('241801390001', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Saripilli Kavya', 'STUDENT', '241801390001', 2, 'CIC', 'B', 'dark'),
+('241801120001', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'T. Siddeswar', 'STUDENT', '241801120001', 2, 'CSE', 'C', 'dark'),
+('241801340001', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Pathivada Haritha', 'STUDENT', '241801340001', 2, 'CSW', 'C', 'dark'),
+('241801360001', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Lenka Surekha', 'STUDENT', '241801360001', 2, 'CSBS', 'C', 'dark'),
+('241814100001', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymY0odAn08zo.c4O2/yG3y', 'Sania Nazeer', 'STUDENT', '241814100001', 2, 'BCA', 'C', 'dark');
 
 -- Insert Subjects
 INSERT INTO subjects (name, code, department) VALUES
-('Data Structures & Algorithms', 'CS301', 'CSE'),
-('Database Management Systems', 'CS302', 'CSE'),
-('Web Development with Spring Boot', 'CS303', 'CSE');
+('Java Programming', 'CS301', 'CSE'),
+('Advanced Java & Spring Boot', 'CS302', 'CSE'),
+('Theory of Computation', 'CS303', 'CSE'),
+('Compiler Design', 'CS304', 'CSE'),
+('Design and Analysis of Algorithms', 'CS305', 'CSE'),
+('Angular Web Development', 'CS306', 'CSE');
 
--- Insert Exams
+-- Insert Exam Timetable
 INSERT INTO exams (title, exam_date, start_time, duration_minutes, status, subject_id) VALUES
-('Data Structures Midterm Exam', CURRENT_DATE + INTERVAL '3 days', '10:00:00', 90, 'SCHEDULED', 1),
-('DBMS Final Examination', CURRENT_DATE + INTERVAL '7 days', '14:00:00', 120, 'SCHEDULED', 2);
+('Core Java Programming Examination', CURRENT_DATE + INTERVAL '1 day', '10:00:00', 90, 'SCHEDULED', 1),
+('Advanced Java & Enterprise Frameworks Exam', CURRENT_DATE + INTERVAL '3 days', '10:00:00', 90, 'SCHEDULED', 2),
+('Theory of Computation Final Exam', CURRENT_DATE + INTERVAL '5 days', '14:00:00', 120, 'SCHEDULED', 3),
+('Compiler Design Semester Exam', CURRENT_DATE + INTERVAL '7 days', '10:00:00', 120, 'SCHEDULED', 4),
+('Design & Analysis of Algorithms Exam', CURRENT_DATE + INTERVAL '9 days', '14:00:00', 120, 'SCHEDULED', 5),
+('Angular Frontend Framework Exam', CURRENT_DATE + INTERVAL '11 days', '10:00:00', 90, 'SCHEDULED', 6);
 
--- Insert Questions for Data Structures Midterm
+-- Insert Questions for Timetable Exams
 INSERT INTO questions (exam_id, question_text, option_a, option_b, option_c, option_d, correct_answer) VALUES
-(1, 'What is the time complexity of searching in a balanced Binary Search Tree?', 'O(1)', 'O(n)', 'O(log n)', 'O(n log n)', 'C'),
-(1, 'Which data structure works on LIFO (Last In First Out) principle?', 'Queue', 'Stack', 'Array', 'Linked List', 'B');
+-- Java Programming (Exam 1)
+(1, 'Which keyword is used to prevent method overriding in Java?', 'static', 'final', 'abstract', 'private', 'B'),
+(1, 'Which memory area in JVM stores class structures and static variables?', 'Heap', 'Stack', 'Method Area / Metaspace', 'Program Counter Register', 'C'),
+-- Advanced Java (Exam 2)
+(2, 'Which annotation in Spring Boot marks a class as a RESTful Controller?', '@Controller', '@Service', '@RestController', '@Component', 'C'),
+(2, 'What is the default scope of a Spring Bean?', 'prototype', 'singleton', 'request', 'session', 'B'),
+-- Theory of Computation (Exam 3)
+(3, 'Which automaton recognizes Context-Free Languages (CFL)?', 'Finite Automaton', 'Pushdown Automaton (PDA)', 'Linear Bounded Automaton', 'Turing Machine', 'B'),
+(3, 'What is the Pumping Lemma used for?', 'To prove a language is regular', 'To prove a language is NOT regular', 'To minimize a DFA', 'To parse CFG', 'B'),
+-- Compiler Design (Exam 4)
+(4, 'Which phase of a compiler performs syntax analysis?', 'Lexical Analyzer', 'Parser', 'Semantic Analyzer', 'Code Generator', 'B'),
+(4, 'What data structure is typically used for symbol table management in compilers?', 'Stack', 'Queue', 'Hash Table', 'Binary Tree', 'C'),
+-- DAA (Exam 5)
+(5, 'Which algorithmic technique solves subproblems only once and stores their results?', 'Greedy Method', 'Divide & Conquer', 'Dynamic Programming', 'Backtracking', 'C'),
+(5, 'What is the average-case time complexity of Merge Sort?', 'O(N²)', 'O(N log N)', 'O(N)', 'O(log N)', 'B'),
+-- Angular (Exam 6)
+(6, 'Which decorator is used to define an Angular Component?', '@NgModule', '@Component', '@Injectable', '@Directive', 'B'),
+(6, 'Which command CLI command generates a new service in Angular?', 'ng new service', 'ng generate service', 'ng create service', 'ng add service', 'B');
 
 -- Insert Admit Card
 INSERT INTO admit_cards (student_id, status) VALUES

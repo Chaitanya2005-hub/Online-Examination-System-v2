@@ -14,7 +14,14 @@ public class QuestionService {
     private QuestionRepository questionRepository;
     
     public List<Question> getQuestionsByExamId(Long examId) {
+        if (examId == null) {
+            return questionRepository.findAll();
+        }
         return questionRepository.findByExamId(examId);
+    }
+    
+    public List<Question> getAllQuestions() {
+        return questionRepository.findAll();
     }
     
     public Question saveQuestion(Question question) {

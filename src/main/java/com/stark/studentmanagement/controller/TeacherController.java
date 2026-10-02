@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,6 +27,12 @@ public class TeacherController {
 
     @Autowired
     private QuestionService questionService;
+
+    @Autowired
+    private GeminiQuestionGeneratorService geminiQuestionGeneratorService;
+
+    @Autowired
+    private ProctoringService proctoringService;
 
     @Autowired
     private ResultService resultService;
@@ -67,6 +74,21 @@ public class TeacherController {
         model.addAttribute("question", new Question());
 
         return "teacher/upload-questions";
+    }
+
+    @PostMapping("/auto-generate-questions")
+    public String autoGenerateQuestions(@RequestParam Long examId,
+                                        @RequestParam(defaultValue = "10") int count,
+                                        @RequestParam(required = false) String topicFocus,
+                                        @RequestParam(defaultValue = "MEDIUM") String difficultyLevel,
+                                        RedirectAttributes redirectAttributes) {
+        try {
+            List<Question> generated = geminiQuestionGeneratorService.generateAndSaveQuestions(examId, count, topicFocus, difficultyLevel);
+            redirectAttributes.addFlashAttribute("success", "✨ Successfully auto-generated and saved " + generated.size() + " (" + difficultyLevel + ") AI questions to the database!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "❌ AI Question Generation failed: " + e.getMessage());
+        }
+        return "redirect:/teacher/upload-questions";
     }
 
     @GetMapping("/manage-exams")
@@ -151,27 +173,41 @@ public class TeacherController {
     }
     
     @GetMapping("/manage-questions")
-    public String manageQuestions(Authentication authentication, Model model) {
+    public String manageQuestions(@RequestParam(required = false) Long examId, Authentication authentication, Model model) {
         User user = userService.findByUsername(authentication.getName());
         model.addAttribute("user", user);
         model.addAttribute("title", "Manage Questions");
         model.addAttribute("theme", "theme-teacher");
         
-        List<Question> questions = questionService.getQuestionsByExamId(null);
+        List<Question> questions = (examId != null) ? questionService.getQuestionsByExamId(examId) : questionService.getAllQuestions();
         model.addAttribute("questions", questions);
+        model.addAttribute("exams", examService.getAllExams());
+        model.addAttribute("selectedExamId", examId);
         
         return "teacher/manage-questions";
     }
+
+    @GetMapping("/manage-questions/delete/{id}")
+    public String deleteQuestion(@PathVariable Long id) {
+        questionService.deleteQuestion(id);
+        return "redirect:/teacher/manage-questions";
+    }
     
     @GetMapping("/mark-attendance")
-    public String markAttendance(Authentication authentication, Model model) {
+    public String markAttendance(@RequestParam(required = false) String department,
+                                 @RequestParam(required = false) String section,
+                                 @RequestParam(required = false) Integer year,
+                                 Authentication authentication, Model model) {
         User user = userService.findByUsername(authentication.getName());
         model.addAttribute("user", user);
         model.addAttribute("title", "Mark Attendance");
         model.addAttribute("theme", "theme-teacher");
 
-        List<User> students = userService.findByRole(User.Role.STUDENT);
+        List<User> students = userService.findStudentsByFilter(department, section, year);
         model.addAttribute("students", students);
+        model.addAttribute("selectedDept", department);
+        model.addAttribute("selectedSection", section);
+        model.addAttribute("selectedYear", year);
 
         return "teacher/mark-attendance";
     }
@@ -237,6 +273,18 @@ public class TeacherController {
         model.addAttribute("results", results);
         
         return "teacher/exam-results-detail";
+    }
+
+    @GetMapping("/live-proctoring")
+    public String liveProctoring(Authentication authentication, Model model) {
+        User user = userService.findByUsername(authentication.getName());
+        model.addAttribute("user", user);
+        model.addAttribute("title", "Live WebCam Proctoring");
+        model.addAttribute("theme", "theme-teacher");
+
+        model.addAttribute("sessions", proctoringService.getActiveSessions());
+
+        return "teacher/live-proctoring";
     }
     
     @GetMapping("/assignments")

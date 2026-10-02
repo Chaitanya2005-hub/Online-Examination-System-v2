@@ -21,8 +21,7 @@ public class Assignment {
     @Column(nullable = false)
     private String title;
     
-    @Lob
-    @Column(length = 5000)
+    @Column(columnDefinition = "TEXT")
     private String description;
     
     @Column(name = "due_date")

@@ -113,6 +113,7 @@
                                       th:text="${exam.status}"></span>
                             </td>
                             <td>
+                                <a th:href="@{/teacher/live-proctoring}" class="btn btn-sm" style="background-color: #dc2626; color: white; margin-right: 4px;">📹 Live Monitor</a>
                                 <a th:href="@{/teacher/manage-exams/edit/{id}(id=${exam.id})}" class="btn btn-sm btn-primary">Edit</a>
                                 <a th:href="@{/teacher/manage-exams/delete/{id}(id=${exam.id})}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this exam? This will also delete all associated questions.');">Delete</a>
                             </td>

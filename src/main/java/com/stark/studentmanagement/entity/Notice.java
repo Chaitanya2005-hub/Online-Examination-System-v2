@@ -21,8 +21,7 @@ public class Notice {
     @Column(nullable = false)
     private String title;
     
-    @Lob
-    @Column(nullable = false, length = 5000)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
     
     @ManyToOne

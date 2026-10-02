@@ -53,9 +53,15 @@
                               style="color: var(--warning-color); font-weight: 600;">Partial</span>
                     </p>
                     
+                    <div style="margin-top: 1.5rem;">
+                        <a th:href="@{/student/fees/download}" class="btn btn-primary" style="width: 100%; text-align: center;">
+                            📄 Download Official Fee Receipt (PDF)
+                        </a>
+                    </div>
+                    
                     <div th:if="${fee.status != T(com.stark.studentmanagement.entity.Fee.FeeStatus).PAID}" 
-                         style="margin-top: 1.5rem;">
-                        <p style="color: var(--text-light); font-size: 0.9rem;">Please contact the administration to pay your fees.</p>
+                         style="margin-top: 1rem;">
+                        <p style="color: var(--text-light); font-size: 0.9rem;">Please contact the administration to pay remaining fees.</p>
                     </div>
                 </div>
             </div>

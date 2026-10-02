@@ -57,30 +57,87 @@
 
         <!-- Manual Mode -->
         <div id="manualMode" style="display: none;">
+            <!-- Filter Box -->
+            <div class="card" style="margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+                <div class="card-header" style="background: rgba(79, 70, 229, 0.05);">
+                    <h3 style="font-size: 1.05rem;">📍 Select Class, Department & Section</h3>
+                </div>
+                <div class="card-body" style="padding: 1.25rem;">
+                    <form th:action="@{/teacher/mark-attendance}" method="get" id="filterForm" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+                        <div>
+                            <label for="deptSelect" style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Department</label>
+                            <select id="deptSelect" name="department" class="form-control" onchange="document.getElementById('filterForm').submit()">
+                                <option value="">-- All Departments --</option>
+                                <option value="CSE" th:selected="${selectedDept == 'CSE'}">CSE</option>
+                                <option value="AIML" th:selected="${selectedDept == 'AIML'}">AIML</option>
+                                <option value="CN" th:selected="${selectedDept == 'CN'}">CN</option>
+                                <option value="CSD" th:selected="${selectedDept == 'CSD'}">CSD</option>
+                                <option value="CIC" th:selected="${selectedDept == 'CIC'}">CIC</option>
+                                <option value="CSW" th:selected="${selectedDept == 'CSW'}">CSW</option>
+                                <option value="CSBS" th:selected="${selectedDept == 'CSBS'}">CSBS</option>
+                                <option value="BCA" th:selected="${selectedDept == 'BCA'}">BCA</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="secSelect" style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Section</label>
+                            <select id="secSelect" name="section" class="form-control" onchange="document.getElementById('filterForm').submit()">
+                                <option value="">-- All Sections --</option>
+                                <option value="A" th:selected="${selectedSection == 'A'}">Section A</option>
+                                <option value="B" th:selected="${selectedSection == 'B'}">Section B</option>
+                                <option value="C" th:selected="${selectedSection == 'C'}">Section C</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="yearSelect" style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Academic Year</label>
+                            <select id="yearSelect" name="year" class="form-control" onchange="document.getElementById('filterForm').submit()">
+                                <option value="">-- All Years --</option>
+                                <option value="1" th:selected="${selectedYear == 1}">Year 1</option>
+                                <option value="2" th:selected="${selectedYear == 2}">Year 2</option>
+                                <option value="3" th:selected="${selectedYear == 3}">Year 3</option>
+                                <option value="4" th:selected="${selectedYear == 4}">Year 4</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <a th:href="@{/teacher/mark-attendance}" class="btn btn-outline" style="width: 100%; text-align: center;">Reset Filter</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="card">
-                <div class="card-header">
-                    <h3>Manual Attendance</h3>
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Manual Attendance List</h3>
+                    <span style="font-size: 0.85rem; background: #e0e7ff; color: #3730a3; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600;" th:text="${students != null ? students.size() + ' Students' : '0 Students'}">0 Students</span>
                 </div>
                 <div class="card-body">
                     <form th:action="@{/teacher/mark-attendance/manual}" method="post">
-                        <div class="form-group" style="margin-bottom: 1rem;">
-                            <label for="attendanceDate">Date</label>
+                        <div class="form-group" style="margin-bottom: 1.5rem; max-width: 300px;">
+                            <label for="attendanceDate" style="font-weight: 600;">Attendance Date</label>
                             <input type="date" id="attendanceDate" name="date" class="form-control" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
                         </div>
 
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Student Name</th>
                                     <th>Roll Number</th>
+                                    <th>Student Name</th>
+                                    <th>Dept</th>
+                                    <th>Year</th>
+                                    <th>Section</th>
                                     <th>Present</th>
                                     <th>Absent</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:each="student : ${students}">
+                                    <td style="font-weight: 600; color: var(--primary-color);" th:text="${student.username}"></td>
                                     <td th:text="${student.fullName}"></td>
-                                    <td th:text="${student.username}"></td>
+                                    <td th:text="${student.department}"></td>
+                                    <td th:text="${'Yr ' + student.year}"></td>
+                                    <td style="font-weight: 700;" th:text="${student.section}"></td>
                                     <td>
                                         <input type="radio" th:name="'attendance[' + ${student.id} + ']'" th:id="'present_' + ${student.id}" value="PRESENT" checked>
                                         <label th:for="'present_' + ${student.id}">Present</label>
@@ -90,10 +147,15 @@
                                         <label th:for="'absent_' + ${student.id}">Absent</label>
                                     </td>
                                 </tr>
+                                <tr th:if="${students == null or students.empty}">
+                                    <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-light);">
+                                        No students found matching the selected section and department criteria.
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
 
-                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Submit Attendance</button>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%;">Submit Section Attendance</button>
                     </form>
                 </div>
             </div>
