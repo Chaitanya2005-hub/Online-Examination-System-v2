@@ -32,6 +32,7 @@ public class User {
     @Column(name = "erp_id")
     private String erpId;
     
+    @Column(name = "student_year")
     private Integer year;
     
     private String department;
