@@ -9,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/admin")
@@ -122,7 +124,19 @@ public class AdminController {
         model.addAttribute("theme", "theme-admin");
         
         List<User> students = userService.findByRole(User.Role.STUDENT);
+        Map<Long, AdmitCard.AdmitCardStatus> admitCardStatusMap = new HashMap<>();
+        for (User student : students) {
+            AdmitCard card = admitCardService.getByStudentId(student.getId());
+            if (card == null) {
+                card = new AdmitCard();
+                card.setStudent(student);
+                card.setStatus(AdmitCard.AdmitCardStatus.BLOCKED);
+                card = admitCardService.saveAdmitCard(card);
+            }
+            admitCardStatusMap.put(student.getId(), card.getStatus());
+        }
         model.addAttribute("students", students);
+        model.addAttribute("admitCardStatusMap", admitCardStatusMap);
         
         return "admin/manage-admit-cards";
     }

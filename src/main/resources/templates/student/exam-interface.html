@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -139,7 +140,7 @@
             background: rgba(79, 70, 229, 0.04);
         }
 
-        .option-card-label input[type="radio"]:checked + .option-custom {
+        .option-card-label input[type="radio"]:checked+.option-custom {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
@@ -268,6 +269,7 @@
         }
     </style>
 </head>
+
 <body class="theme-student" onblur="handleFocusLoss()">
 
     <!-- Anti-Cheating Warning Modal -->
@@ -275,7 +277,8 @@
         <div class="warning-content">
             <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">⚠️ SECURITY WARNING</h2>
             <p id="warningText" style="font-size: 1.1rem; line-height: 1.5;">You switched tabs/windows!</p>
-            <p style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.8;">Please return to the exam immediately. Focus loss will cause automatic submission.</p>
+            <p style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.8;">Please return to the exam immediately. Focus
+                loss will cause automatic submission.</p>
         </div>
     </div>
 
@@ -285,12 +288,14 @@
         <div class="exam-header">
             <div class="exam-title-box">
                 <h2 th:text="${exam.title}">Exam Title</h2>
-                <div style="font-size: 0.85rem; color: #64748b;" th:text="${exam.subject != null ? exam.subject.name : 'Course Examination'}">Subject Name</div>
+                <div style="font-size: 0.85rem; color: #64748b;"
+                    th:text="${exam.subject != null ? exam.subject.name : 'Course Examination'}">Subject Name</div>
             </div>
-            
+
             <div style="display: flex; align-items: center; gap: 1rem;">
                 <div style="text-align: right;">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">Time Remaining</div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">
+                        Time Remaining</div>
                     <div class="timer-badge" id="timer">00:00:00</div>
                 </div>
             </div>
@@ -298,42 +303,56 @@
 
         <form th:action="@{/student/exam/{id}/submit(id=${exam.id})}" method="post" id="examForm">
             <div class="exam-layout">
-                
+
                 <!-- Main Question View Area -->
                 <div>
-                    <div th:each="question, stat : ${questions}" class="question-card question-slide" th:id="'qSlide_' + ${stat.index}" style="display: none;">
+                    <div th:each="question, stat : ${questions}" class="question-card question-slide"
+                        th:id="'qSlide_' + ${stat.index}" style="display: none;">
                         <div>
                             <div class="question-header">
-                                <span class="question-number" th:text="'Question ' + ${stat.index + 1} + ' of ' + ${questions.size()}">Question 1 of 10</span>
-                                <span style="font-size: 0.85rem; padding: 0.25rem 0.75rem; background: #e0e7ff; color: #3730a3; border-radius: 9999px; font-weight: 600;">Single Answer MCQ</span>
+                                <span class="question-number"
+                                    th:text="'Question ' + ${stat.index + 1} + ' of ' + ${questions.size()}">Question 1
+                                    of 10</span>
+                                <span
+                                    style="font-size: 0.85rem; padding: 0.25rem 0.75rem; background: #e0e7ff; color: #3730a3; border-radius: 9999px; font-weight: 600;">Single
+                                    Answer MCQ</span>
                             </div>
 
                             <div class="progress-bar-container">
                                 <div class="progress-bar-fill" th:id="'progress_' + ${stat.index}"></div>
                             </div>
 
-                            <div class="question-text-box" style="margin-top: 1.5rem;" th:text="${question.questionText}">
+                            <div class="question-text-box" style="margin-top: 1.5rem;"
+                                th:text="${question.questionText}">
                                 Question text goes here...
                             </div>
 
                             <div class="options-grid">
                                 <label class="option-card-label" th:onclick="'selectOption(' + ${stat.index} + ', 0)'">
-                                    <input type="radio" th:name="'answers[' + ${stat.index} + ']'" value="0" style="width: 18px; height: 18px;" th:onchange="'markAnswered(' + ${stat.index} + ')'">
+                                    <input type="radio" th:name="'answers[' + ${stat.index} + ']'" value="0"
+                                        style="width: 18px; height: 18px;"
+                                        th:onchange="'markAnswered(' + ${stat.index} + ')'">
                                     <span><strong>A.</strong> <span th:text="${question.optionA}">Option A</span></span>
                                 </label>
 
                                 <label class="option-card-label" th:onclick="'selectOption(' + ${stat.index} + ', 1)'">
-                                    <input type="radio" th:name="'answers[' + ${stat.index} + ']'" value="1" style="width: 18px; height: 18px;" th:onchange="'markAnswered(' + ${stat.index} + ')'">
+                                    <input type="radio" th:name="'answers[' + ${stat.index} + ']'" value="1"
+                                        style="width: 18px; height: 18px;"
+                                        th:onchange="'markAnswered(' + ${stat.index} + ')'">
                                     <span><strong>B.</strong> <span th:text="${question.optionB}">Option B</span></span>
                                 </label>
 
                                 <label class="option-card-label" th:onclick="'selectOption(' + ${stat.index} + ', 2)'">
-                                    <input type="radio" th:name="'answers[' + ${stat.index} + ']'" value="2" style="width: 18px; height: 18px;" th:onchange="'markAnswered(' + ${stat.index} + ')'">
+                                    <input type="radio" th:name="'answers[' + ${stat.index} + ']'" value="2"
+                                        style="width: 18px; height: 18px;"
+                                        th:onchange="'markAnswered(' + ${stat.index} + ')'">
                                     <span><strong>C.</strong> <span th:text="${question.optionC}">Option C</span></span>
                                 </label>
 
                                 <label class="option-card-label" th:onclick="'selectOption(' + ${stat.index} + ', 3)'">
-                                    <input type="radio" th:name="'answers[' + ${stat.index} + ']'" value="3" style="width: 18px; height: 18px;" th:onchange="'markAnswered(' + ${stat.index} + ')'">
+                                    <input type="radio" th:name="'answers[' + ${stat.index} + ']'" value="3"
+                                        style="width: 18px; height: 18px;"
+                                        th:onchange="'markAnswered(' + ${stat.index} + ')'">
                                     <span><strong>D.</strong> <span th:text="${question.optionD}">Option D</span></span>
                                 </label>
                             </div>
@@ -341,15 +360,19 @@
 
                         <!-- Navigation Bar -->
                         <div class="nav-buttons">
-                            <button type="button" class="btn btn-outline" id="prevBtn" onclick="navigateQuestion(-1)" style="padding: 0.6rem 1.25rem;">
+                            <button type="button" class="btn btn-outline" id="prevBtn" onclick="navigateQuestion(-1)"
+                                style="padding: 0.6rem 1.25rem;">
                                 ⬅️ Previous
                             </button>
 
-                            <button type="button" class="btn btn-outline" th:onclick="'clearOption(' + ${stat.index} + ')'" style="font-size: 0.85rem; color: #64748b;">
+                            <button type="button" class="btn btn-outline"
+                                th:onclick="'clearOption(' + ${stat.index} + ')'"
+                                style="font-size: 0.85rem; color: #64748b;">
                                 🗑️ Clear Choice
                             </button>
 
-                            <button type="button" class="btn btn-primary" id="nextBtn" onclick="navigateQuestion(1)" style="padding: 0.6rem 1.5rem; background: var(--primary);">
+                            <button type="button" class="btn btn-primary" id="nextBtn" onclick="navigateQuestion(1)"
+                                style="padding: 0.6rem 1.5rem; background: var(--primary);">
                                 Next ➡️
                             </button>
                         </div>
@@ -359,15 +382,20 @@
                 <!-- Right Question Palette Sidebar -->
                 <div>
                     <!-- Live WebCam Proctoring PIP Widget -->
-                    <div class="palette-card" style="margin-bottom: 1rem; border: 2px solid #ef4444; background: #000; color: white; padding: 0.75rem; border-radius: 12px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <span style="font-size: 0.75rem; font-weight: 700; color: #ef4444; display: flex; align-items: center; gap: 0.35rem;">
-                                <span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block;"></span>
+                    <div class="palette-card"
+                        style="margin-bottom: 1rem; border: 2px solid #ef4444; background: #000; color: white; padding: 0.75rem; border-radius: 12px;">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span
+                                style="font-size: 0.75rem; font-weight: 700; color: #ef4444; display: flex; align-items: center; gap: 0.35rem;">
+                                <span
+                                    style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block;"></span>
                                 🔴 LIVE PROCTOR CAM
                             </span>
                             <span style="font-size: 0.7rem; color: #94a3b8;">FACULTY STREAM</span>
                         </div>
-                        <video id="proctorWebcam" autoplay playsinline muted style="width: 100%; height: 140px; object-fit: cover; border-radius: 8px; background: #1e293b;"></video>
+                        <video id="proctorWebcam" autoplay playsinline muted
+                            style="width: 100%; height: 140px; object-fit: cover; border-radius: 8px; background: #1e293b;"></video>
                         <canvas id="proctorCanvas" style="display: none;" width="320" height="240"></canvas>
                         <div style="font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: 0.35rem;">
                             Camera feed is compulsory & monitored by faculty
@@ -379,11 +407,9 @@
                         <div style="font-size: 0.8rem; color: #64748b;">Click number to jump directly</div>
 
                         <div class="palette-grid">
-                            <button type="button" th:each="question, stat : ${questions}" 
-                                    th:id="'pBtn_' + ${stat.index}"
-                                    class="palette-btn"
-                                    th:onclick="'jumpToQuestion(' + ${stat.index} + ')'"
-                                    th:text="${stat.index + 1}">
+                            <button type="button" th:each="question, stat : ${questions}"
+                                th:id="'pBtn_' + ${stat.index}" class="palette-btn"
+                                th:onclick="'jumpToQuestion(' + ${stat.index} + ')'" th:text="${stat.index + 1}">
                                 1
                             </button>
                         </div>
@@ -403,7 +429,8 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-success" onclick="confirmSubmit()" style="width: 100%; margin-top: 1.5rem; padding: 0.75rem; font-weight: 700; background: #10b981; border: none;">
+                        <button type="button" class="btn btn-success" onclick="confirmSubmit()"
+                            style="width: 100%; margin-top: 1.5rem; padding: 0.75rem; font-weight: 700; background: #10b981; border: none;">
                             ✅ Submit Examination
                         </button>
                     </div>
@@ -415,7 +442,7 @@
 
     <script th:inline="javascript">
         let currentIdx = 0;
-        const totalQuestions = [[${questions.size()}]];
+        const totalQuestions = [[${ questions.size() }]];
         let warningCount = 0;
         const MAX_WARNINGS = 3;
         let timerInterval;
@@ -490,7 +517,7 @@
         }
 
         // Countdown Timer
-        const duration = [[${exam.durationMinutes}]] * 60;
+        const duration = [[${ exam.durationMinutes }]] * 60;
         let timeLeft = duration;
 
         function updateTimer() {
@@ -562,7 +589,7 @@
 
         // WebCam & Audio Live Proctoring Stream
         let webcamStream = null;
-        const examIdVal = [[${exam.id}]];
+        const examIdVal = [[${ exam.id }]];
         const examTitleVal = /*[[${exam.title}]]*/ "Online Exam";
 
         function initWebcamProctoring() {
@@ -698,4 +725,5 @@
         });
     </script>
 </body>
+
 </html>

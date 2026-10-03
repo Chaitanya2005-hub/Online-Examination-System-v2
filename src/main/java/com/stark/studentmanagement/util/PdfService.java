@@ -175,17 +175,22 @@ public class PdfService {
         table.setSpacingBefore(15f);
         table.setSpacingAfter(15f);
 
+        String totalStr = (fee != null && fee.getTotalAmount() != null) ? fee.getTotalAmount().toString() : "50,000.00";
+        String paidStr = (fee != null && fee.getPaidAmount() != null) ? fee.getPaidAmount().toString() : "0.00";
+        String dueStr = (fee != null) ? fee.getDueAmount().toString() : "50,000.00";
+        String statusStr = (fee != null && fee.getStatus() != null) ? fee.getStatus().toString() : "PENDING";
+
         table.addCell(createCell("Total Academic Fee:", normalFont, true));
-        table.addCell(createCell("Rs. " + (fee != null ? fee.getTotalAmount() : "50,000.00"), normalFont, false));
+        table.addCell(createCell("Rs. " + totalStr, normalFont, false));
 
         table.addCell(createCell("Paid Amount:", normalFont, true));
-        table.addCell(createCell("Rs. " + (fee != null ? fee.getPaidAmount() : "35,000.00"), normalFont, false));
+        table.addCell(createCell("Rs. " + paidStr, normalFont, false));
 
         table.addCell(createCell("Due Amount:", normalFont, true));
-        table.addCell(createCell("Rs. " + (fee != null ? fee.getDueAmount() : "15,000.00"), normalFont, false));
+        table.addCell(createCell("Rs. " + dueStr, normalFont, false));
 
         table.addCell(createCell("Payment Status:", normalFont, true));
-        table.addCell(createCell(fee != null ? fee.getStatus().toString() : "PARTIAL", normalFont, true));
+        table.addCell(createCell(statusStr, normalFont, true));
 
         document.add(table);
         addFooterSignature(document);

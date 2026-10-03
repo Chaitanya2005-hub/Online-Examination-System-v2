@@ -244,9 +244,17 @@ public class TeacherController {
     
     @GetMapping(value = "/qr-code", produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
-    public byte[] generateQrCode() throws Exception {
-        String code = liveCodeService.generateLiveCode();
-        return qrService.generateQrCodeBytes(code, 300, 300);
+    public byte[] generateQrCode() {
+        try {
+            String code = liveCodeService.generateLiveCode();
+            return qrService.generateQrCodeBytes(code, 300, 300);
+        } catch (Exception e) {
+            try {
+                return qrService.generateQrCodeBytes("ATTENDANCE", 300, 300);
+            } catch (Exception ex) {
+                return new byte[0];
+            }
+        }
     }
     
     @GetMapping("/exam-results")

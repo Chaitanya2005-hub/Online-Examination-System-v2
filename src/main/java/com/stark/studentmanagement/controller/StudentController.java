@@ -158,7 +158,7 @@ public class StudentController {
         if (admitCard == null && user.getRole() == User.Role.STUDENT) {
             admitCard = new AdmitCard();
             admitCard.setStudent(user);
-            admitCard.setStatus(AdmitCard.AdmitCardStatus.RELEASED);
+            admitCard.setStatus(AdmitCard.AdmitCardStatus.BLOCKED);
             admitCard = admitCardService.saveAdmitCard(admitCard);
         }
         model.addAttribute("admitCard", admitCard);
@@ -173,7 +173,7 @@ public class StudentController {
         if (admitCard == null && user.getRole() == User.Role.STUDENT) {
             admitCard = new AdmitCard();
             admitCard.setStudent(user);
-            admitCard.setStatus(AdmitCard.AdmitCardStatus.RELEASED);
+            admitCard.setStatus(AdmitCard.AdmitCardStatus.BLOCKED);
             admitCard = admitCardService.saveAdmitCard(admitCard);
         }
 
@@ -236,6 +236,14 @@ public class StudentController {
     public void downloadFeeReceipt(Authentication authentication, HttpServletResponse response) throws Exception {
         User user = userService.findByUsername(authentication.getName());
         Fee fee = feeService.getByStudentId(user.getId());
+        if (fee == null && user.getRole() == User.Role.STUDENT) {
+            fee = new Fee();
+            fee.setStudent(user);
+            fee.setTotalAmount(new BigDecimal("50000.00"));
+            fee.setPaidAmount(new BigDecimal("35000.00"));
+            fee.setStatus(Fee.FeeStatus.PARTIAL);
+            fee = feeService.saveFee(fee);
+        }
 
         String filePath = "admit_cards/" + user.getUsername() + "_fee_receipt.pdf";
         new File("admit_cards").mkdirs();

@@ -64,10 +64,14 @@
                             <td th:text="${student.department}"></td>
                             <td th:text="${student.year}"></td>
                             <td>
+                                <span th:if="${admitCardStatusMap.get(student.id) == T(com.stark.studentmanagement.entity.AdmitCard.AdmitCardStatus).RELEASED}" class="badge badge-success">RELEASED</span>
+                                <span th:if="${admitCardStatusMap.get(student.id) == T(com.stark.studentmanagement.entity.AdmitCard.AdmitCardStatus).BLOCKED}" class="badge badge-danger">BLOCKED</span>
+                            </td>
+                            <td>
                                 <form th:action="@{/admin/manage-admit-cards/{studentId}(studentId=${student.id})}" method="post" style="display: inline;">
-                                    <select name="status" class="form-control" style="padding: 0.25rem; font-size: 0.85rem; width: auto;">
-                                        <option value="BLOCKED">Blocked</option>
-                                        <option value="RELEASED">Released</option>
+                                    <select name="status" class="form-control" style="padding: 0.25rem; font-size: 0.85rem; width: auto; display: inline-block;">
+                                        <option value="BLOCKED" th:selected="${admitCardStatusMap.get(student.id) == T(com.stark.studentmanagement.entity.AdmitCard.AdmitCardStatus).BLOCKED}">Blocked</option>
+                                        <option value="RELEASED" th:selected="${admitCardStatusMap.get(student.id) == T(com.stark.studentmanagement.entity.AdmitCard.AdmitCardStatus).RELEASED}">Released</option>
                                     </select>
                                     <button type="submit" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.85rem; margin-left: 0.5rem;">Update</button>
                                 </form>
