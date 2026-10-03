@@ -142,6 +142,9 @@ public class AdminController {
         List<Fee> fees = feeService.getAllFees();
         model.addAttribute("fees", fees);
         
+        List<User> allStudents = userService.findByRole(User.Role.STUDENT);
+        model.addAttribute("allStudents", allStudents);
+        
         java.math.BigDecimal totalCollected = fees.stream()
                 .map(f -> f.getPaidAmount() != null ? f.getPaidAmount() : java.math.BigDecimal.ZERO)
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
@@ -164,6 +167,76 @@ public class AdminController {
         model.addAttribute("disapprovedCount", disapprovedCount);
         
         return "admin/admin-fees";
+    }
+    
+    @PostMapping("/admin-fees/add")
+    public String addFee(@RequestParam Long studentId,
+                         @RequestParam java.math.BigDecimal totalAmount,
+                         @RequestParam(required = false, defaultValue = "0") java.math.BigDecimal paidAmount,
+                         @RequestParam String approvalStatus,
+                         org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        User student = userService.findById(studentId);
+        if (student != null) {
+            Fee fee = feeService.getByStudentId(studentId);
+            if (fee == null) {
+                fee = new Fee();
+                fee.setStudent(student);
+            }
+            fee.setTotalAmount(totalAmount);
+            fee.setPaidAmount(paidAmount);
+            fee.setApprovalStatus(Fee.ApprovalStatus.valueOf(approvalStatus));
+            
+            if (paidAmount.compareTo(totalAmount) >= 0 && totalAmount.compareTo(java.math.BigDecimal.ZERO) > 0) {
+                fee.setStatus(Fee.FeeStatus.PAID);
+            } else if (paidAmount.compareTo(java.math.BigDecimal.ZERO) > 0) {
+                fee.setStatus(Fee.FeeStatus.PARTIAL);
+            } else {
+                fee.setStatus(Fee.FeeStatus.PENDING);
+            }
+            feeService.saveFee(fee);
+            redirectAttributes.addFlashAttribute("successMessage", "Fee record assigned/updated for " + student.getFullName() + "!");
+        }
+        return "redirect:/admin/admin-fees";
+    }
+
+    @PostMapping("/admin-fees/generate-mock")
+    public String generateMockFees(org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        List<User> students = userService.findByRole(User.Role.STUDENT);
+        int count = 0;
+        int index = 0;
+        for (User st : students) {
+            Fee f = feeService.getByStudentId(st.getId());
+            if (f == null) {
+                f = new Fee();
+                f.setStudent(st);
+            }
+            if (st.getUsername().equals("241801120002")) {
+                f.setTotalAmount(new java.math.BigDecimal("50000.00"));
+                f.setPaidAmount(new java.math.BigDecimal("35000.00"));
+                f.setStatus(Fee.FeeStatus.PARTIAL);
+                f.setApprovalStatus(Fee.ApprovalStatus.APPROVED);
+            } else if (index % 3 == 0) {
+                f.setTotalAmount(new java.math.BigDecimal("50000.00"));
+                f.setPaidAmount(new java.math.BigDecimal("50000.00"));
+                f.setStatus(Fee.FeeStatus.PAID);
+                f.setApprovalStatus(Fee.ApprovalStatus.APPROVED);
+            } else if (index % 3 == 1) {
+                f.setTotalAmount(new java.math.BigDecimal("52000.00"));
+                f.setPaidAmount(new java.math.BigDecimal("25000.00"));
+                f.setStatus(Fee.FeeStatus.PARTIAL);
+                f.setApprovalStatus(Fee.ApprovalStatus.PENDING);
+            } else {
+                f.setTotalAmount(new java.math.BigDecimal("48000.00"));
+                f.setPaidAmount(new java.math.BigDecimal("0.00"));
+                f.setStatus(Fee.FeeStatus.PENDING);
+                f.setApprovalStatus(Fee.ApprovalStatus.DISAPPROVED);
+            }
+            feeService.saveFee(f);
+            count++;
+            index++;
+        }
+        redirectAttributes.addFlashAttribute("successMessage", "Successfully populated mock fee data for " + count + " students!");
+        return "redirect:/admin/admin-fees";
     }
     
     @PostMapping("/admin-fees/edit")

@@ -100,9 +100,15 @@
         </div>
 
         <div class="card">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>Student Fee Directory</h3>
-                <input type="text" id="feeSearch" placeholder="Search student name, ERP..." onkeyup="filterFees()" class="form-control" style="width: 250px; padding: 0.4rem 0.75rem; font-size: 0.85rem;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                <h3 style="margin: 0;">Student Fee Directory</h3>
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="openAddModal()" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">+ Assign Fee</button>
+                    <form th:action="@{/admin/admin-fees/generate-mock}" method="post" style="margin: 0;">
+                        <button type="submit" class="btn btn-outline" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;" onclick="return confirm('Generate mock fee records for all students missing fees?')">⚡ Seed All Mock Fees</button>
+                    </form>
+                    <input type="text" id="feeSearch" placeholder="Search student name, ERP..." onkeyup="filterFees()" class="form-control" style="width: 200px; padding: 0.4rem 0.75rem; font-size: 0.85rem;">
+                </div>
             </div>
             <div class="card-body" style="overflow-x: auto;">
                 <table class="table" id="feeTable">
@@ -144,7 +150,7 @@
                                 <div class="action-group">
                                     <!-- Edit Button -->
                                     <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
-                                            th:onclick="'openEditModal(' + ${fee.id} + ', \'' + ${fee.student?.fullName} + '\', ' + ${fee.totalAmount} + ', ' + ${fee.paidAmount} + ', \'' + ${fee.approvalStatus} + '\')'">
+                                            th:onclick="'openEditModal(' + ${fee.id} + ', \'' + ${#strings.escapeJavaScript(fee.student?.fullName)} + '\', ' + ${fee.totalAmount} + ', ' + ${fee.paidAmount} + ', \'' + ${fee.approvalStatus} + '\')'">
                                         ✏️ Edit
                                     </button>
 
@@ -171,6 +177,46 @@
             </div>
         </div>
     </main>
+
+    <!-- Add Fee Modal -->
+    <div id="addFeeModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1rem;">Assign New Fee Record</h3>
+            <form th:action="@{/admin/admin-fees/add}" method="post">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Select Student</label>
+                    <select name="studentId" required class="form-control" style="width: 100%; padding: 0.5rem;">
+                        <option value="" disabled selected>-- Select Student --</option>
+                        <option th:each="st : ${allStudents}" th:value="${st.id}" th:text="${st.fullName} + ' (' + (${st.erpId != null ? st.erpId : st.username}) + ' - ' + ${st.department} + ')'"></option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Total Fee Amount (₹)</label>
+                    <input type="number" step="0.01" name="totalAmount" value="50000.00" required class="form-control" style="width: 100%; padding: 0.5rem;">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Paid Amount (₹)</label>
+                    <input type="number" step="0.01" name="paidAmount" value="0.00" required class="form-control" style="width: 100%; padding: 0.5rem;">
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Approval Status</label>
+                    <select name="approvalStatus" class="form-control" style="width: 100%; padding: 0.5rem;">
+                        <option value="APPROVED">APPROVED</option>
+                        <option value="PENDING" selected>PENDING</option>
+                        <option value="DISAPPROVED">DISAPPROVED</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" class="btn btn-outline" onclick="closeAddModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Assign Fee</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Edit Fee Modal -->
     <div id="editFeeModal" class="modal-overlay">
@@ -213,6 +259,14 @@
     </footer>
 
     <script>
+        function openAddModal() {
+            document.getElementById('addFeeModal').classList.add('active');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addFeeModal').classList.remove('active');
+        }
+
         function openEditModal(id, studentName, total, paid, approvalStatus) {
             document.getElementById('editFeeId').value = id;
             document.getElementById('modalStudentTitle').innerText = 'Edit Fee: ' + studentName;
