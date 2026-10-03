@@ -101,8 +101,10 @@ CREATE TABLE fees (
     student_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     total_amount NUMERIC(38,2) NOT NULL,
     paid_amount NUMERIC(38,2),
-    status VARCHAR(255) NOT NULL CHECK (status IN ('PENDING', 'PAID', 'PARTIAL'))
+    status VARCHAR(255) NOT NULL CHECK (status IN ('PENDING', 'PAID', 'PARTIAL')),
+    approval_status VARCHAR(255) CHECK (approval_status IN ('PENDING', 'APPROVED', 'DISAPPROVED'))
 );
+
 
 -- 10. Grievances Table
 CREATE TABLE grievances (
@@ -226,9 +228,12 @@ INSERT INTO attendance (student_id, date, status, marked_by) VALUES
 (4, CURRENT_DATE, 'ABSENT', 2);
 
 -- Insert Fees
-INSERT INTO fees (student_id, total_amount, paid_amount, status) VALUES
-(3, 2500.00, 1000.00, 'PARTIAL'),
-(4, 2500.00, 2500.00, 'PAID');
+INSERT INTO fees (student_id, total_amount, paid_amount, status, approval_status) VALUES
+(3, 50000.00, 35000.00, 'PARTIAL', 'APPROVED'),
+(4, 50000.00, 50000.00, 'PAID', 'APPROVED'),
+(5, 52000.00, 25000.00, 'PARTIAL', 'PENDING'),
+(6, 48000.00, 0.00, 'PENDING', 'DISAPPROVED');
+
 
 -- Insert Grievances
 INSERT INTO grievances (student_id, category, description, status) VALUES

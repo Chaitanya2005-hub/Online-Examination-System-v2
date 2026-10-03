@@ -32,7 +32,23 @@ public class Fee {
     @Column(nullable = false)
     private FeeStatus status;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "approval_status")
+    private ApprovalStatus approvalStatus = ApprovalStatus.PENDING;
+    
     public enum FeeStatus {
         PENDING, PAID, PARTIAL
     }
+    
+    public enum ApprovalStatus {
+        PENDING, APPROVED, DISAPPROVED
+    }
+
+    public BigDecimal getDueAmount() {
+        BigDecimal total = totalAmount != null ? totalAmount : BigDecimal.ZERO;
+        BigDecimal paid = paidAmount != null ? paidAmount : BigDecimal.ZERO;
+        BigDecimal due = total.subtract(paid);
+        return due.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : due;
+    }
 }
+

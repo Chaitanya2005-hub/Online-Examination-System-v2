@@ -15,6 +15,14 @@ public class FeeService {
     @Autowired
     private FeeRepository feeRepository;
     
+    public List<Fee> getAllFees() {
+        return feeRepository.findAll();
+    }
+    
+    public Fee getById(Long id) {
+        return feeRepository.findById(id).orElse(null);
+    }
+    
     public Fee getByStudentId(Long studentId) {
         return feeRepository.findByStudentId(studentId).orElse(null);
     }
@@ -27,11 +35,53 @@ public class FeeService {
         return feeRepository.save(fee);
     }
     
+    public Fee editFee(Long feeId, BigDecimal totalAmount, BigDecimal paidAmount, Fee.ApprovalStatus approvalStatus) {
+        Optional<Fee> feeOpt = feeRepository.findById(feeId);
+        if (feeOpt.isPresent()) {
+            Fee fee = feeOpt.get();
+            if (totalAmount != null) {
+                fee.setTotalAmount(totalAmount);
+            }
+            if (paidAmount != null) {
+                fee.setPaidAmount(paidAmount);
+            }
+            if (approvalStatus != null) {
+                fee.setApprovalStatus(approvalStatus);
+            }
+            
+            // Recalculate financial status based on total and paid amount
+            BigDecimal total = fee.getTotalAmount() != null ? fee.getTotalAmount() : BigDecimal.ZERO;
+            BigDecimal paid = fee.getPaidAmount() != null ? fee.getPaidAmount() : BigDecimal.ZERO;
+            
+            if (paid.compareTo(total) >= 0 && total.compareTo(BigDecimal.ZERO) > 0) {
+                fee.setStatus(Fee.FeeStatus.PAID);
+            } else if (paid.compareTo(BigDecimal.ZERO) > 0) {
+                fee.setStatus(Fee.FeeStatus.PARTIAL);
+            } else {
+                fee.setStatus(Fee.FeeStatus.PENDING);
+            }
+            
+            return feeRepository.save(fee);
+        }
+        return null;
+    }
+    
+    public Fee updateApprovalStatus(Long feeId, Fee.ApprovalStatus approvalStatus) {
+        Optional<Fee> feeOpt = feeRepository.findById(feeId);
+        if (feeOpt.isPresent()) {
+            Fee fee = feeOpt.get();
+            fee.setApprovalStatus(approvalStatus);
+            return feeRepository.save(fee);
+        }
+        return null;
+    }
+    
     public Fee updatePayment(Long studentId, BigDecimal amount) {
         Optional<Fee> feeOpt = feeRepository.findByStudentId(studentId);
         if (feeOpt.isPresent()) {
             Fee fee = feeOpt.get();
-            fee.setPaidAmount(fee.getPaidAmount().add(amount));
+            BigDecimal newPaid = fee.getPaidAmount() != null ? fee.getPaidAmount().add(amount) : amount;
+            fee.setPaidAmount(newPaid);
             
             if (fee.getPaidAmount().compareTo(fee.getTotalAmount()) >= 0) {
                 fee.setStatus(Fee.FeeStatus.PAID);
@@ -44,3 +94,4 @@ public class FeeService {
         return null;
     }
 }
+

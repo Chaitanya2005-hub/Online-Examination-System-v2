@@ -32,25 +32,43 @@
     <main class="container" style="padding-top: 2rem;">
         <div style="margin-bottom: 2rem;">
             <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Fee Details</h1>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Check fee payment status</p>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Check fee payment status & administrative verification</p>
         </div>
         
         <div th:if="${fee != null}">
             <div class="card" style="max-width: 600px; margin: 0 auto;">
-                <div class="card-header">
-                    <h3>Fee Status</h3>
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Academic Fee Status</h3>
+                    <span th:if="${fee.approvalStatus == T(com.stark.studentmanagement.entity.Fee.ApprovalStatus).APPROVED}" 
+                          style="background-color: #d1fae5; color: #065f46; padding: 0.25rem 0.6rem; border-radius: 4px; font-weight: 600; font-size: 0.85rem;">
+                        ✅ Admin Approved
+                    </span>
+                    <span th:if="${fee.approvalStatus == T(com.stark.studentmanagement.entity.Fee.ApprovalStatus).DISAPPROVED}" 
+                          style="background-color: #fee2e2; color: #991b1b; padding: 0.25rem 0.6rem; border-radius: 4px; font-weight: 600; font-size: 0.85rem;">
+                        ❌ Disapproved
+                    </span>
+                    <span th:if="${fee.approvalStatus == T(com.stark.studentmanagement.entity.Fee.ApprovalStatus).PENDING or fee.approvalStatus == null}" 
+                          style="background-color: #fef3c7; color: #92400e; padding: 0.25rem 0.6rem; border-radius: 4px; font-weight: 600; font-size: 0.85rem;">
+                        ⏳ Pending Approval
+                    </span>
                 </div>
                 <div class="card-body">
-                    <p style="margin-bottom: 0.5rem;"><strong>Total Amount:</strong> ₹<span th:text="${fee.totalAmount}">50000</span></p>
-                    <p style="margin-bottom: 0.5rem;"><strong>Paid Amount:</strong> ₹<span th:text="${fee.paidAmount}">0</span></p>
-                    <p style="margin-bottom: 0.5rem;"><strong>Remaining:</strong> ₹<span th:text="${fee.totalAmount - fee.paidAmount}">50000</span></p>
-                    <p style="margin-bottom: 1rem;"><strong>Status:</strong> 
+                    <!-- Disapproved Alert -->
+                    <div th:if="${fee.approvalStatus == T(com.stark.studentmanagement.entity.Fee.ApprovalStatus).DISAPPROVED}"
+                         style="background-color: #fee2e2; color: #991b1b; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; border-left: 4px solid #ef4444; font-size: 0.9rem;">
+                        ⚠️ <strong>Fee Disapproved:</strong> Your fee record has been disapproved by the accounts administration. Please contact the finance desk for resolution.
+                    </div>
+
+                    <p style="margin-bottom: 0.5rem;"><strong>Total Amount:</strong> ₹<span th:text="${#numbers.formatDecimal(fee.totalAmount, 1, 'COMMA', 2, 'POINT')}">50,000.00</span></p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Paid Amount:</strong> ₹<span th:text="${#numbers.formatDecimal(fee.paidAmount, 1, 'COMMA', 2, 'POINT')}">35,000.00</span></p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Remaining Due:</strong> ₹<span th:text="${#numbers.formatDecimal(fee.dueAmount, 1, 'COMMA', 2, 'POINT')}">15,000.00</span></p>
+                    <p style="margin-bottom: 1rem;"><strong>Payment Status:</strong> 
                         <span th:if="${fee.status == T(com.stark.studentmanagement.entity.Fee.FeeStatus).PAID}" 
-                              style="color: var(--success-color); font-weight: 600;">Paid</span>
+                              style="color: var(--success-color); font-weight: 600;">PAID</span>
                         <span th:if="${fee.status == T(com.stark.studentmanagement.entity.Fee.FeeStatus).PENDING}" 
-                              style="color: var(--danger-color); font-weight: 600;">Pending</span>
+                              style="color: var(--danger-color); font-weight: 600;">UNPAID</span>
                         <span th:if="${fee.status == T(com.stark.studentmanagement.entity.Fee.FeeStatus).PARTIAL}" 
-                              style="color: var(--warning-color); font-weight: 600;">Partial</span>
+                              style="color: var(--warning-color); font-weight: 600;">PARTIAL</span>
                     </p>
                     
                     <div style="margin-top: 1.5rem;">

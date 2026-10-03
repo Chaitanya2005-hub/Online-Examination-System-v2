@@ -41,9 +41,9 @@ public class DataInitializer implements CommandLineRunner {
 
             // Seed Faculty / Teachers
             User teacher = new User();
-            teacher.setUsername("teacher");
+            teacher.setUsername("bruce");
             teacher.setPassword(encodedPass);
-            teacher.setFullName("Dr. Sarah Smith");
+            teacher.setFullName("Prof. Bruce Banner");
             teacher.setRole(User.Role.TEACHER);
             teacher.setDepartment("CSE");
             teacher.setErpId("FAC001");
@@ -139,13 +139,43 @@ public class DataInitializer implements CommandLineRunner {
             assignment.setCreatedBy(teacher);
             assignmentRepository.save(assignment);
 
-            // Seed Fee
-            Fee fee = new Fee();
-            fee.setStudent(student);
-            fee.setTotalAmount(new BigDecimal("2500.00"));
-            fee.setPaidAmount(new BigDecimal("1000.00"));
-            fee.setStatus(Fee.FeeStatus.PARTIAL);
-            feeRepository.save(fee);
+            // Seed Fee Mock Data for all students
+            List<User> allStudents = userRepository.findByRole(User.Role.STUDENT);
+            int feeIndex = 0;
+            for (User st : allStudents) {
+                Fee f = new Fee();
+                f.setStudent(st);
+                
+                if (st.getUsername().equals("241801120002")) {
+                    // Main Student
+                    f.setTotalAmount(new BigDecimal("50000.00"));
+                    f.setPaidAmount(new BigDecimal("35000.00"));
+                    f.setStatus(Fee.FeeStatus.PARTIAL);
+                    f.setApprovalStatus(Fee.ApprovalStatus.APPROVED);
+                } else if (feeIndex % 4 == 0) {
+                    f.setTotalAmount(new BigDecimal("50000.00"));
+                    f.setPaidAmount(new BigDecimal("50000.00"));
+                    f.setStatus(Fee.FeeStatus.PAID);
+                    f.setApprovalStatus(Fee.ApprovalStatus.APPROVED);
+                } else if (feeIndex % 4 == 1) {
+                    f.setTotalAmount(new BigDecimal("52000.00"));
+                    f.setPaidAmount(new BigDecimal("25000.00"));
+                    f.setStatus(Fee.FeeStatus.PARTIAL);
+                    f.setApprovalStatus(Fee.ApprovalStatus.APPROVED);
+                } else if (feeIndex % 4 == 2) {
+                    f.setTotalAmount(new BigDecimal("48000.00"));
+                    f.setPaidAmount(new BigDecimal("10000.00"));
+                    f.setStatus(Fee.FeeStatus.PARTIAL);
+                    f.setApprovalStatus(Fee.ApprovalStatus.PENDING);
+                } else {
+                    f.setTotalAmount(new BigDecimal("50000.00"));
+                    f.setPaidAmount(new BigDecimal("0.00"));
+                    f.setStatus(Fee.FeeStatus.PENDING);
+                    f.setApprovalStatus(Fee.ApprovalStatus.DISAPPROVED);
+                }
+                feeRepository.save(f);
+                feeIndex++;
+            }
 
             // ==========================================
             // SEED EXAM TIMETABLE & QUESTION PAPERS

@@ -139,10 +139,58 @@ public class AdminController {
         model.addAttribute("title", "Fee Management");
         model.addAttribute("theme", "theme-admin");
         
-        List<Fee> fees = feeService.getByStatus(Fee.FeeStatus.PENDING);
+        List<Fee> fees = feeService.getAllFees();
         model.addAttribute("fees", fees);
         
+        java.math.BigDecimal totalCollected = fees.stream()
+                .map(f -> f.getPaidAmount() != null ? f.getPaidAmount() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+                
+        long pendingCount = fees.stream()
+                .filter(f -> f.getApprovalStatus() == Fee.ApprovalStatus.PENDING)
+                .count();
+                
+        long approvedCount = fees.stream()
+                .filter(f -> f.getApprovalStatus() == Fee.ApprovalStatus.APPROVED)
+                .count();
+                
+        long disapprovedCount = fees.stream()
+                .filter(f -> f.getApprovalStatus() == Fee.ApprovalStatus.DISAPPROVED)
+                .count();
+                
+        model.addAttribute("totalCollected", totalCollected);
+        model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("approvedCount", approvedCount);
+        model.addAttribute("disapprovedCount", disapprovedCount);
+        
         return "admin/admin-fees";
+    }
+    
+    @PostMapping("/admin-fees/edit")
+    public String editFee(@RequestParam Long feeId,
+                          @RequestParam java.math.BigDecimal totalAmount,
+                          @RequestParam java.math.BigDecimal paidAmount,
+                          @RequestParam String approvalStatus,
+                          org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        feeService.editFee(feeId, totalAmount, paidAmount, Fee.ApprovalStatus.valueOf(approvalStatus));
+        redirectAttributes.addFlashAttribute("successMessage", "Fee details updated successfully!");
+        return "redirect:/admin/admin-fees";
+    }
+    
+    @PostMapping("/admin-fees/{feeId}/approve")
+    public String approveFee(@PathVariable Long feeId,
+                             org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        feeService.updateApprovalStatus(feeId, Fee.ApprovalStatus.APPROVED);
+        redirectAttributes.addFlashAttribute("successMessage", "Fee record APPROVED successfully!");
+        return "redirect:/admin/admin-fees";
+    }
+    
+    @PostMapping("/admin-fees/{feeId}/disapprove")
+    public String disapproveFee(@PathVariable Long feeId,
+                                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        feeService.updateApprovalStatus(feeId, Fee.ApprovalStatus.DISAPPROVED);
+        redirectAttributes.addFlashAttribute("successMessage", "Fee record DISAPPROVED!");
+        return "redirect:/admin/admin-fees";
     }
     
     @PostMapping("/admin-fees/{studentId}")
