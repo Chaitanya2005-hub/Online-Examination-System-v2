@@ -1,10 +1,12 @@
 package com.stark.studentmanagement.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 
 import javax.sql.DataSource;
 
@@ -15,31 +17,45 @@ public class DataSourceConfig {
     private static final String DEFAULT_NEON_USER = "neondb_owner";
     private static final String DEFAULT_NEON_PASS = "npg_HCOPJnw1sKx2";
 
+    @Autowired
+    private Environment environment;
+
     @Bean
     @Primary
     public DataSourceProperties dataSourceProperties() {
         DataSourceProperties properties = new DataSourceProperties();
         
-        String envUrl = System.getenv("SPRING_DATASOURCE_URL");
-        String envUser = System.getenv("SPRING_DATASOURCE_USERNAME");
-        String envPass = System.getenv("SPRING_DATASOURCE_PASSWORD");
+        String url = environment.getProperty("SPRING_DATASOURCE_URL");
+        if (url == null || url.trim().isEmpty()) {
+            url = environment.getProperty("spring.datasource.url");
+        }
+        
+        String user = environment.getProperty("SPRING_DATASOURCE_USERNAME");
+        if (user == null || user.trim().isEmpty()) {
+            user = environment.getProperty("spring.datasource.username");
+        }
+        
+        String pass = environment.getProperty("SPRING_DATASOURCE_PASSWORD");
+        if (pass == null || pass.trim().isEmpty()) {
+            pass = environment.getProperty("spring.datasource.password");
+        }
 
-        // If envUrl is missing, empty, or contains dummy placeholder text, fallback to Neon PostgreSQL
-        if (envUrl == null || envUrl.trim().isEmpty() || envUrl.contains("<your-mysql-host>") || envUrl.contains("<") || envUrl.contains(">")) {
+        // If URL is missing, empty, or contains dummy placeholder text, fallback to live Neon PostgreSQL
+        if (url == null || url.trim().isEmpty() || url.contains("<your-mysql-host>") || url.contains("<") || url.contains(">")) {
             properties.setUrl(DEFAULT_NEON_URL);
             properties.setUsername(DEFAULT_NEON_USER);
             properties.setPassword(DEFAULT_NEON_PASS);
             properties.setDriverClassName("org.postgresql.Driver");
         } else {
-            properties.setUrl(envUrl);
-            properties.setUsername(envUser != null && !envUser.trim().isEmpty() ? envUser : DEFAULT_NEON_USER);
-            properties.setPassword(envPass != null && !envPass.trim().isEmpty() ? envPass : DEFAULT_NEON_PASS);
+            properties.setUrl(url);
+            properties.setUsername(user != null && !user.trim().isEmpty() ? user : DEFAULT_NEON_USER);
+            properties.setPassword(pass != null && !pass.trim().isEmpty() ? pass : DEFAULT_NEON_PASS);
             
-            if (envUrl.startsWith("jdbc:postgresql")) {
+            if (url.startsWith("jdbc:postgresql")) {
                 properties.setDriverClassName("org.postgresql.Driver");
-            } else if (envUrl.startsWith("jdbc:mysql")) {
+            } else if (url.startsWith("jdbc:mysql")) {
                 properties.setDriverClassName("com.mysql.cj.jdbc.Driver");
-            } else if (envUrl.startsWith("jdbc:h2")) {
+            } else if (url.startsWith("jdbc:h2")) {
                 properties.setDriverClassName("org.h2.Driver");
             }
         }
