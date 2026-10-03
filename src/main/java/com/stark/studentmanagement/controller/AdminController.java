@@ -35,6 +35,9 @@ public class AdminController {
     @Autowired
     private SubjectService subjectService;
     
+    @Autowired
+    private ProctoringService proctoringService;
+    
     @GetMapping("/dashboard")
     public String dashboard(Authentication authentication, Model model) {
         User user = userService.findByUsername(authentication.getName());
@@ -150,7 +153,7 @@ public class AdminController {
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
                 
         long pendingCount = fees.stream()
-                .filter(f -> f.getApprovalStatus() == Fee.ApprovalStatus.PENDING)
+                .filter(f -> f.getApprovalStatus() == Fee.ApprovalStatus.PENDING || f.getApprovalStatus() == null)
                 .count();
                 
         long approvedCount = fees.stream()
@@ -167,6 +170,16 @@ public class AdminController {
         model.addAttribute("disapprovedCount", disapprovedCount);
         
         return "admin/admin-fees";
+    }
+
+    @GetMapping({"/live-monitoring", "/live-proctoring"})
+    public String liveMonitoring(Authentication authentication, Model model) {
+        User user = userService.findByUsername(authentication.getName());
+        model.addAttribute("user", user);
+        model.addAttribute("title", "Live WebCam Monitoring");
+        model.addAttribute("theme", "theme-admin");
+        model.addAttribute("sessions", proctoringService.getActiveSessions());
+        return "admin/live-monitoring";
     }
     
     @PostMapping("/admin-fees/add")

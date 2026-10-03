@@ -59,6 +59,14 @@
             <nav class="nav-links">
                 <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
                 <a th:href="@{/admin/dashboard}">Dashboard</a>
+                <a th:href="@{/admin/manage-users}">Users</a>
+                <a th:href="@{/admin/schedule-exam}">Exams</a>
+                <a th:href="@{/admin/post-notice}">Notices</a>
+                <a th:href="@{/admin/manage-admit-cards}">Admit Cards</a>
+                <a th:href="@{/admin/admin-fees}">Fees</a>
+                <a th:href="@{/admin/grievances}">Grievances</a>
+                <a th:href="@{/admin/manage-subjects}">Subjects</a>
+                <a th:href="@{/admin/live-monitoring}">Live Monitoring</a>
                 <button id="themeToggle" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;" onclick="toggleTheme()">
                     🌙
                 </button>
@@ -82,7 +90,7 @@
         <!-- Summary Cards -->
         <div class="stats-grid" style="margin-bottom: 2rem;">
             <div class="stat-card">
-                <div class="stat-value">₹<span th:text="${#numbers.formatDecimal(totalCollected, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+                <div class="stat-value">₹<span th:text="${totalCollected != null ? #numbers.formatDecimal(totalCollected, 1, 'COMMA', 2, 'POINT') : '0.00'}">0.00</span></div>
                 <div class="stat-label">Total Revenue Collected</div>
             </div>
             <div class="stat-card">
@@ -133,9 +141,9 @@
                             <td>
                                 <span th:text="${fee.student?.department}">Dept</span> - Sec <span th:text="${fee.student?.section}">C</span>
                             </td>
-                            <td th:text="${#numbers.formatDecimal(fee.totalAmount, 1, 'COMMA', 2, 'POINT')}">50,000.00</td>
-                            <td th:text="${#numbers.formatDecimal(fee.paidAmount, 1, 'COMMA', 2, 'POINT')}">35,000.00</td>
-                            <td th:text="${#numbers.formatDecimal(fee.dueAmount, 1, 'COMMA', 2, 'POINT')}">15,000.00</td>
+                            <td th:text="${fee.totalAmount != null ? #numbers.formatDecimal(fee.totalAmount, 1, 'COMMA', 2, 'POINT') : '0.00'}">50,000.00</td>
+                            <td th:text="${fee.paidAmount != null ? #numbers.formatDecimal(fee.paidAmount, 1, 'COMMA', 2, 'POINT') : '0.00'}">35,000.00</td>
+                            <td th:text="${fee.dueAmount != null ? #numbers.formatDecimal(fee.dueAmount, 1, 'COMMA', 2, 'POINT') : '0.00'}">15,000.00</td>
                             <td>
                                 <span th:if="${fee.status == T(com.stark.studentmanagement.entity.Fee.FeeStatus).PAID}" class="badge badge-success">PAID</span>
                                 <span th:if="${fee.status == T(com.stark.studentmanagement.entity.Fee.FeeStatus).PARTIAL}" class="badge badge-warning">PARTIAL</span>
@@ -150,7 +158,7 @@
                                 <div class="action-group">
                                     <!-- Edit Button -->
                                     <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
-                                            th:onclick="'openEditModal(' + ${fee.id} + ', \'' + ${#strings.escapeJavaScript(fee.student?.fullName)} + '\', ' + ${fee.totalAmount} + ', ' + ${fee.paidAmount} + ', \'' + ${fee.approvalStatus} + '\')'">
+                                            th:onclick="'openEditModal(' + ${fee.id} + ', \'' + ${#strings.escapeJavaScript(fee.student?.fullName != null ? fee.student.fullName : '')} + '\', ' + ${fee.totalAmount != null ? fee.totalAmount : 0} + ', ' + ${fee.paidAmount != null ? fee.paidAmount : 0} + ', \'' + ${fee.approvalStatus != null ? fee.approvalStatus : 'PENDING'} + '\')'">
                                         ✏️ Edit
                                     </button>
 

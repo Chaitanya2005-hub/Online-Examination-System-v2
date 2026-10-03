@@ -25,6 +25,7 @@
                 <a th:href="@{/admin/admin-fees}">Fees</a>
                 <a th:href="@{/admin/grievances}">Grievances</a>
                 <a th:href="@{/admin/manage-subjects}">Subjects</a>
+                <a th:href="@{/admin/live-monitoring}">Live Monitoring</a>
                 <button id="themeToggle" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;" onclick="toggleTheme()">
                     🌙
                 </button>
@@ -54,6 +55,11 @@
         
         <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">Quick Actions</h2>
         <div class="dashboard-grid">
+            <a th:href="@{/admin/live-monitoring}" class="dashboard-card" style="border: 2px solid #3b82f6;">
+                <div class="icon">🎥</div>
+                <h3>Live Monitoring</h3>
+                <p>Real-time proctoring & violation logs</p>
+            </a>
             <a th:href="@{/admin/manage-users}" class="dashboard-card">
                 <div class="icon">👥</div>
                 <h3>Manage Users</h3>

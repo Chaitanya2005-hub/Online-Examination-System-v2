@@ -19,6 +19,14 @@
             <nav class="nav-links">
                 <span th:text="${user.fullName}" style="font-weight: 500; color: var(--text-dark);"></span>
                 <a th:href="@{/admin/dashboard}">Dashboard</a>
+                <a th:href="@{/admin/manage-users}">Users</a>
+                <a th:href="@{/admin/schedule-exam}">Exams</a>
+                <a th:href="@{/admin/post-notice}">Notices</a>
+                <a th:href="@{/admin/manage-admit-cards}">Admit Cards</a>
+                <a th:href="@{/admin/admin-fees}">Fees</a>
+                <a th:href="@{/admin/grievances}">Grievances</a>
+                <a th:href="@{/admin/manage-subjects}">Subjects</a>
+                <a th:href="@{/admin/live-monitoring}">Live Monitoring</a>
                 <button id="themeToggle" class="btn btn-outline" style="padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;" onclick="toggleTheme()">
                     🌙
                 </button>
