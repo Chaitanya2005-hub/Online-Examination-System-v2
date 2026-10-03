@@ -59,9 +59,9 @@
                         ⚠️ <strong>Fee Disapproved:</strong> Your fee record has been disapproved by the accounts administration. Please contact the finance desk for resolution.
                     </div>
 
-                    <p style="margin-bottom: 0.5rem;"><strong>Total Amount:</strong> ₹<span th:text="${#numbers.formatDecimal(fee.totalAmount, 1, 'COMMA', 2, 'POINT')}">50,000.00</span></p>
-                    <p style="margin-bottom: 0.5rem;"><strong>Paid Amount:</strong> ₹<span th:text="${#numbers.formatDecimal(fee.paidAmount, 1, 'COMMA', 2, 'POINT')}">35,000.00</span></p>
-                    <p style="margin-bottom: 0.5rem;"><strong>Remaining Due:</strong> ₹<span th:text="${#numbers.formatDecimal(fee.dueAmount, 1, 'COMMA', 2, 'POINT')}">15,000.00</span></p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Total Amount:</strong> ₹<span th:text="${fee.totalAmount != null ? #numbers.formatDecimal(fee.totalAmount, 1, 2) : '0.00'}">50,000.00</span></p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Paid Amount:</strong> ₹<span th:text="${fee.paidAmount != null ? #numbers.formatDecimal(fee.paidAmount, 1, 2) : '0.00'}">35,000.00</span></p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Remaining Due:</strong> ₹<span th:text="${fee.dueAmount != null ? #numbers.formatDecimal(fee.dueAmount, 1, 2) : '0.00'}">15,000.00</span></p>
                     <p style="margin-bottom: 1rem;"><strong>Payment Status:</strong> 
                         <span th:if="${fee.status == T(com.stark.studentmanagement.entity.Fee.FeeStatus).PAID}" 
                               style="color: var(--success-color); font-weight: 600;">PAID</span>

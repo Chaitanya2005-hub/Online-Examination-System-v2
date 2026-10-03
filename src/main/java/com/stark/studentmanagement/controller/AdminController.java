@@ -157,25 +157,29 @@ public class AdminController {
         model.addAttribute("theme", "theme-admin");
         
         List<Fee> fees = feeService.getAllFees();
+        if (fees == null) {
+            fees = new java.util.ArrayList<>();
+        }
         model.addAttribute("fees", fees);
         
         List<User> allStudents = userService.findByRole(User.Role.STUDENT);
         model.addAttribute("allStudents", allStudents);
         
         java.math.BigDecimal totalCollected = fees.stream()
+                .filter(f -> f != null)
                 .map(f -> f.getPaidAmount() != null ? f.getPaidAmount() : java.math.BigDecimal.ZERO)
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
                 
         long pendingCount = fees.stream()
-                .filter(f -> f.getApprovalStatus() == Fee.ApprovalStatus.PENDING || f.getApprovalStatus() == null)
+                .filter(f -> f != null && (f.getApprovalStatus() == Fee.ApprovalStatus.PENDING || f.getApprovalStatus() == null))
                 .count();
                 
         long approvedCount = fees.stream()
-                .filter(f -> f.getApprovalStatus() == Fee.ApprovalStatus.APPROVED)
+                .filter(f -> f != null && f.getApprovalStatus() == Fee.ApprovalStatus.APPROVED)
                 .count();
                 
         long disapprovedCount = fees.stream()
-                .filter(f -> f.getApprovalStatus() == Fee.ApprovalStatus.DISAPPROVED)
+                .filter(f -> f != null && f.getApprovalStatus() == Fee.ApprovalStatus.DISAPPROVED)
                 .count();
                 
         model.addAttribute("totalCollected", totalCollected);
