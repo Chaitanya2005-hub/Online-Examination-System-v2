@@ -40,8 +40,15 @@ public class DataSourceConfig {
             pass = environment.getProperty("spring.datasource.password");
         }
 
-        // If URL is missing, empty, or contains dummy placeholder text, fallback to live Neon PostgreSQL
-        if (url == null || url.trim().isEmpty() || url.contains("<your-mysql-host>") || url.contains("<") || url.contains(">")) {
+        // If URL is missing, empty, starts with jdbc:mysql, or contains placeholder host text, force Neon PostgreSQL
+        boolean isInvalidOrMysql = url == null 
+                || url.trim().isEmpty() 
+                || url.startsWith("jdbc:mysql") 
+                || url.contains("your-mysql-host") 
+                || url.contains("<") 
+                || url.contains(">");
+
+        if (isInvalidOrMysql) {
             properties.setUrl(DEFAULT_NEON_URL);
             properties.setUsername(DEFAULT_NEON_USER);
             properties.setPassword(DEFAULT_NEON_PASS);
@@ -53,10 +60,10 @@ public class DataSourceConfig {
             
             if (url.startsWith("jdbc:postgresql")) {
                 properties.setDriverClassName("org.postgresql.Driver");
-            } else if (url.startsWith("jdbc:mysql")) {
-                properties.setDriverClassName("com.mysql.cj.jdbc.Driver");
             } else if (url.startsWith("jdbc:h2")) {
                 properties.setDriverClassName("org.h2.Driver");
+            } else {
+                properties.setDriverClassName("org.postgresql.Driver");
             }
         }
         
