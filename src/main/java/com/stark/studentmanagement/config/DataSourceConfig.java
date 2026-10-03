@@ -1,5 +1,6 @@
 package com.stark.studentmanagement.config;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,6 +50,15 @@ public class DataSourceConfig {
     @Bean
     @Primary
     public DataSource dataSource(DataSourceProperties properties) {
-        return properties.initializeDataSourceBuilder().build();
+        HikariDataSource dataSource = properties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
+        
+        // Configure robust HikariCP settings for serverless cloud connection
+        dataSource.setConnectionTimeout(30000); // 30 seconds for cold-start serverless compute
+        dataSource.setIdleTimeout(300000); // 5 minutes
+        dataSource.setMaxLifetime(1800000); // 30 minutes
+        dataSource.setMaximumPoolSize(10);
+        dataSource.setMinimumIdle(2);
+        
+        return dataSource;
     }
 }
