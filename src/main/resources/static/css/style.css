@@ -604,7 +604,122 @@ body.dark-mode .badge-danger {
     color: #fca5a5;
 }
 
-/* Footer */
+/* ==========================================
+   ANIMATIONS & DYNAMIC MICRO-INTERACTIONS
+   ========================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+    }
+}
+
+@keyframes floatSoft {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+}
+
+/* Page Entry Animations */
+main > div,
+.card,
+.stat-card,
+.dashboard-card,
+.alert {
+    animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Stagger Delays */
+.dashboard-grid > *:nth-child(1) { animation-delay: 0.05s; }
+.dashboard-grid > *:nth-child(2) { animation-delay: 0.1s; }
+.dashboard-grid > *:nth-child(3) { animation-delay: 0.15s; }
+.dashboard-grid > *:nth-child(4) { animation-delay: 0.2s; }
+.dashboard-grid > *:nth-child(5) { animation-delay: 0.25s; }
+.dashboard-grid > *:nth-child(6) { animation-delay: 0.3s; }
+
+.stats-grid > *:nth-child(1) { animation-delay: 0.05s; }
+.stats-grid > *:nth-child(2) { animation-delay: 0.1s; }
+.stats-grid > *:nth-child(3) { animation-delay: 0.15s; }
+.stats-grid > *:nth-child(4) { animation-delay: 0.2s; }
+
+/* Enhanced Button Interactions */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:active {
+    transform: scale(0.97) translateY(0) !important;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.btn:hover::after {
+    width: 200%;
+    height: 200%;
+}
+
+/* Modal Animations */
+.modal-overlay.active {
+    display: flex !important;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.modal-overlay.active .modal-content {
+    animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Table Row Hover Animations */
+.table tbody tr {
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.table tbody tr:hover {
+    transform: scale(1.002);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Footer & Theme Transition */
 footer {
     background-color: var(--white);
     border-top: 1px solid var(--border-color);
@@ -613,6 +728,7 @@ footer {
     text-align: center;
     color: var(--text-light);
     font-size: 0.875rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Responsive */
@@ -636,3 +752,4 @@ footer {
         gap: 1rem;
     }
 }
+
