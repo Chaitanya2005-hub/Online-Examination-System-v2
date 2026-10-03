@@ -158,7 +158,12 @@
                                 <div class="action-group">
                                     <!-- Edit Button -->
                                     <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
-                                            th:onclick="'openEditModal(' + ${fee.id} + ', \'' + ${#strings.escapeJavaScript(fee.student?.fullName != null ? fee.student.fullName : '')} + '\', ' + ${fee.totalAmount != null ? fee.totalAmount : 0} + ', ' + ${fee.paidAmount != null ? fee.paidAmount : 0} + ', \'' + ${fee.approvalStatus != null ? fee.approvalStatus : 'PENDING'} + '\')'">
+                                            th:data-id="${fee.id}"
+                                            th:data-name="${fee.student?.fullName != null ? fee.student.fullName : 'Student'}"
+                                            th:data-total="${fee.totalAmount != null ? fee.totalAmount : 0}"
+                                            th:data-paid="${fee.paidAmount != null ? fee.paidAmount : 0}"
+                                            th:data-status="${fee.approvalStatus != null ? fee.approvalStatus : 'PENDING'}"
+                                            onclick="handleEditClick(this)">
                                         ✏️ Edit
                                     </button>
 
@@ -273,6 +278,15 @@
 
         function closeAddModal() {
             document.getElementById('addFeeModal').classList.remove('active');
+        }
+
+        function handleEditClick(btn) {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            const total = btn.getAttribute('data-total');
+            const paid = btn.getAttribute('data-paid');
+            const status = btn.getAttribute('data-status');
+            openEditModal(id, name, total, paid, status);
         }
 
         function openEditModal(id, studentName, total, paid, approvalStatus) {
