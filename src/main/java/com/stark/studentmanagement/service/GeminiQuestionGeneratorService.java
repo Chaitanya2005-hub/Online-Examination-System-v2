@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -35,23 +36,20 @@ public class GeminiQuestionGeneratorService {
     @Value("${gemini.api.url:https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent}")
     private String apiUrl;
 
-    public List<Question> generateAndSaveQuestions(Long examId, int count, String topicFocus, String difficultyLevel) {
+    public List<Question> generateAndSaveQuestions(Long examId, int count, String topicFocus, String difficultyLevel, String customApiKey) {
         Exam exam = examRepository.findById(examId)
                 .orElseThrow(() -> new IllegalArgumentException("Exam not found with ID: " + examId));
 
         String subjectName = exam.getSubject() != null ? exam.getSubject().getName() : exam.getTitle();
+        String effectiveKey = (customApiKey != null && !customApiKey.trim().isEmpty()) ? customApiKey.trim() : this.apiKey;
         List<Question> questions = new ArrayList<>();
 
-        if (apiKey != null && !apiKey.trim().isEmpty()) {
-            try {
-                String prompt = buildPrompt(subjectName, topicFocus, count, difficultyLevel);
-                String rawResponse = callGeminiApi(prompt);
-                questions = parseQuestionsFromJson(rawResponse, exam);
-            } catch (Exception e) {
-                System.err.println("Gemini API call failed, falling back to smart template generation: " + e.getMessage());
-                questions = generateMockQuestions(exam, subjectName, topicFocus, count, difficultyLevel);
-            }
+        if (effectiveKey != null && !effectiveKey.trim().isEmpty()) {
+            String prompt = buildPrompt(subjectName, topicFocus, count, difficultyLevel);
+            String rawResponse = callGeminiApiWithFallback(prompt, effectiveKey);
+            questions = parseQuestionsFromJson(rawResponse, exam);
         } else {
+            // No API key specified anywhere -> generate mock questions as template
             questions = generateMockQuestions(exam, subjectName, topicFocus, count, difficultyLevel);
         }
 
@@ -60,6 +58,14 @@ public class GeminiQuestionGeneratorService {
         }
 
         return questions;
+    }
+
+    public List<Question> generateAndSaveQuestions(Long examId, int count, String topicFocus, String difficultyLevel) {
+        return generateAndSaveQuestions(examId, count, topicFocus, difficultyLevel, null);
+    }
+
+    public List<Question> generateAndSaveQuestions(Long examId, int count, String topicFocus) {
+        return generateAndSaveQuestions(examId, count, topicFocus, "MEDIUM", null);
     }
 
     private List<Question> generateMockQuestions(Exam exam, String subjectName, String topicFocus, int count, String difficultyLevel) {
@@ -78,10 +84,6 @@ public class GeminiQuestionGeneratorService {
             list.add(q);
         }
         return list;
-    }
-
-    public List<Question> generateAndSaveQuestions(Long examId, int count, String topicFocus) {
-        return generateAndSaveQuestions(examId, count, topicFocus, "MEDIUM");
     }
 
     private String buildPrompt(String subjectName, String topicFocus, int count, String difficultyLevel) {
@@ -112,12 +114,41 @@ public class GeminiQuestionGeneratorService {
         return sb.toString();
     }
 
-    private String callGeminiApi(String prompt) {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            throw new IllegalStateException("Google Gemini API Key is not configured! Please set 'gemini.api.key' in application.properties or set the GEMINI_API_KEY environment variable.");
+    private String callGeminiApiWithFallback(String prompt, String keyToUse) {
+        String[] modelEndpoints = {
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent"
+        };
+
+        Exception lastException = null;
+
+        for (String endpoint : modelEndpoints) {
+            try {
+                return callSingleGeminiEndpoint(endpoint, prompt, keyToUse);
+            } catch (HttpClientErrorException e) {
+                lastException = e;
+                if (e.getStatusCode().value() == 400 || e.getStatusCode().value() == 401 || e.getStatusCode().value() == 403) {
+                    throw new RuntimeException("API Key or request rejected by Google (" + e.getStatusCode() + "): " + e.getResponseBodyAsString(), e);
+                }
+            } catch (Exception e) {
+                lastException = e;
+            }
         }
 
-        String fullUrl = apiUrl + "?key=" + apiKey;
+        if (lastException != null) {
+            if (lastException instanceof RuntimeException) {
+                throw (RuntimeException) lastException;
+            }
+            throw new RuntimeException("Gemini API call failed: " + lastException.getMessage(), lastException);
+        }
+
+        throw new RuntimeException("Gemini API call failed across all endpoints.");
+    }
+
+    private String callSingleGeminiEndpoint(String endpointUrl, String prompt, String keyToUse) {
+        String fullUrl = endpointUrl + "?key=" + keyToUse;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -155,10 +186,9 @@ public class GeminiQuestionGeneratorService {
             JsonArray parts = content.getAsJsonArray("parts");
             if (parts == null || parts.size() == 0) return questions;
 
-            String textContent = parts.get(0).getAsJsonObject().get("text").getAsString();
+            String textContent = parts.get(0).getAsJsonObject().get("text").getAsString().trim();
             
             // Clean markdown code blocks if Gemini returns ```json ... ```
-            textContent = textContent.trim();
             if (textContent.startsWith("```json")) {
                 textContent = textContent.substring(7);
             } else if (textContent.startsWith("```")) {
@@ -168,6 +198,12 @@ public class GeminiQuestionGeneratorService {
                 textContent = textContent.substring(0, textContent.length() - 3);
             }
             textContent = textContent.trim();
+
+            int firstBracket = textContent.indexOf('[');
+            int lastBracket = textContent.lastIndexOf(']');
+            if (firstBracket != -1 && lastBracket != -1 && lastBracket > firstBracket) {
+                textContent = textContent.substring(firstBracket, lastBracket + 1);
+            }
 
             JsonArray jsonArray = gson.fromJson(textContent, JsonArray.class);
             for (JsonElement element : jsonArray) {

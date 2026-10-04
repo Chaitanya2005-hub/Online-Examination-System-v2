@@ -81,12 +81,13 @@ public class TeacherController {
                                         @RequestParam(defaultValue = "10") int count,
                                         @RequestParam(required = false) String topicFocus,
                                         @RequestParam(defaultValue = "MEDIUM") String difficultyLevel,
+                                        @RequestParam(required = false) String apiKey,
                                         RedirectAttributes redirectAttributes) {
         try {
-            List<Question> generated = geminiQuestionGeneratorService.generateAndSaveQuestions(examId, count, topicFocus, difficultyLevel);
+            List<Question> generated = geminiQuestionGeneratorService.generateAndSaveQuestions(examId, count, topicFocus, difficultyLevel, apiKey);
             redirectAttributes.addFlashAttribute("success", "✨ Successfully auto-generated and saved " + generated.size() + " (" + difficultyLevel + ") AI questions to the database!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "❌ AI Question Generation failed: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "❌ Google Gemini AI Error: " + e.getMessage());
         }
         return "redirect:/teacher/upload-questions";
     }
