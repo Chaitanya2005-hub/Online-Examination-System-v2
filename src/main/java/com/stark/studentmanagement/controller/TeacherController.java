@@ -197,29 +197,49 @@ public class TeacherController {
     public String markAttendance(@RequestParam(required = false) String department,
                                  @RequestParam(required = false) String section,
                                  @RequestParam(required = false) Integer year,
+                                 @RequestParam(required = false) String dateStr,
                                  Authentication authentication, Model model) {
         User user = userService.findByUsername(authentication.getName());
         model.addAttribute("user", user);
         model.addAttribute("title", "Mark Attendance");
         model.addAttribute("theme", "theme-teacher");
 
+        LocalDate date = (dateStr != null && !dateStr.trim().isEmpty()) ? LocalDate.parse(dateStr) : LocalDate.now();
         List<User> students = userService.findStudentsByFilter(department, section, year);
+
+        Map<Long, Attendance.AttendanceStatus> attendanceStatusMap = new java.util.HashMap<>();
+        for (User student : students) {
+            Attendance att = attendanceService.findByStudentIdAndDate(student.getId(), date);
+            if (att != null) {
+                attendanceStatusMap.put(student.getId(), att.getStatus());
+            }
+        }
+
         model.addAttribute("students", students);
         model.addAttribute("selectedDept", department);
         model.addAttribute("selectedSection", section);
         model.addAttribute("selectedYear", year);
+        model.addAttribute("selectedDate", date.toString());
+        model.addAttribute("attendanceStatusMap", attendanceStatusMap);
 
         return "teacher/mark-attendance";
     }
 
     @PostMapping("/mark-attendance/manual")
     public String markAttendanceManual(@RequestParam("date") String dateStr,
+                                       @RequestParam(required = false) String department,
+                                       @RequestParam(required = false) String section,
+                                       @RequestParam(required = false) Integer year,
                                        @RequestParam Map<String, String> attendanceMap,
-                                       Authentication authentication) {
+                                       Authentication authentication,
+                                       RedirectAttributes redirectAttributes) {
         User teacher = userService.findByUsername(authentication.getName());
         LocalDate date = LocalDate.parse(dateStr);
+        int count = 0;
 
-        attendanceMap.forEach((key, value) -> {
+        for (Map.Entry<String, String> entry : attendanceMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
             if (key.startsWith("attendance[")) {
                 Long studentId = Long.parseLong(key.substring(11, key.length() - 1));
                 Attendance.AttendanceStatus status = Attendance.AttendanceStatus.valueOf(value);
@@ -235,11 +255,23 @@ public class TeacherController {
                     attendance.setStatus(status);
                     attendance.setMarkedBy(teacher);
                     attendanceService.saveAttendance(attendance);
+                } else {
+                    existingAttendance.setStatus(status);
+                    existingAttendance.setMarkedBy(teacher);
+                    attendanceService.saveAttendance(existingAttendance);
                 }
+                count++;
             }
-        });
+        }
 
-        return "redirect:/teacher/mark-attendance";
+        redirectAttributes.addFlashAttribute("successMessage", "✅ Attendance saved successfully for " + count + " students!");
+        
+        StringBuilder redirectUrl = new StringBuilder("redirect:/teacher/mark-attendance?dateStr=").append(dateStr);
+        if (department != null && !department.isEmpty()) redirectUrl.append("&department=").append(department);
+        if (section != null && !section.isEmpty()) redirectUrl.append("&section=").append(section);
+        if (year != null) redirectUrl.append("&year=").append(year);
+
+        return redirectUrl.toString();
     }
     
     @GetMapping(value = "/qr-code", produces = MediaType.IMAGE_PNG_VALUE)

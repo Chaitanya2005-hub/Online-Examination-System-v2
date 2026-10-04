@@ -65,14 +65,24 @@ public class AdminController {
     }
     
     @PostMapping("/manage-users")
-    public String addUser(@ModelAttribute User newUser) {
-        userService.registerUser(newUser);
+    public String addUser(@ModelAttribute User newUser, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            userService.registerUser(newUser);
+            redirectAttributes.addFlashAttribute("successMessage", "User " + newUser.getFullName() + " created successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to add user: " + e.getMessage());
+        }
         return "redirect:/admin/manage-users";
     }
     
     @GetMapping("/manage-users/delete/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    public String deleteUser(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            userService.deleteUser(id);
+            redirectAttributes.addFlashAttribute("successMessage", "User deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete user: " + e.getMessage());
+        }
         return "redirect:/admin/manage-users";
     }
     
@@ -143,9 +153,11 @@ public class AdminController {
     
     @PostMapping("/manage-admit-cards/{studentId}")
     public String updateAdmitCard(@PathVariable Long studentId, 
-                                   @RequestParam String status) {
+                                   @RequestParam String status,
+                                   org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         AdmitCard.AdmitCardStatus cardStatus = AdmitCard.AdmitCardStatus.valueOf(status);
         admitCardService.updateStatus(studentId, cardStatus);
+        redirectAttributes.addFlashAttribute("successMessage", "Admit card status updated to " + status + "!");
         return "redirect:/admin/manage-admit-cards";
     }
     
@@ -318,8 +330,9 @@ public class AdminController {
     }
     
     @PostMapping("/grievances/{id}/resolve")
-    public String resolveGrievance(@PathVariable Long id) {
+    public String resolveGrievance(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         grievanceService.updateStatus(id, Grievance.GrievanceStatus.RESOLVED);
+        redirectAttributes.addFlashAttribute("successMessage", "Grievance resolved successfully!");
         return "redirect:/admin/grievances";
     }
     

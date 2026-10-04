@@ -5,10 +5,12 @@ import com.stark.studentmanagement.entity.User;
 import com.stark.studentmanagement.repository.GrievanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class GrievanceService {
     
     @Autowired

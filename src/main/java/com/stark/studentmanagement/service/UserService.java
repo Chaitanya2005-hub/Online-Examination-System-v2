@@ -1,14 +1,11 @@
 package com.stark.studentmanagement.service;
 
-import com.stark.studentmanagement.entity.AdmitCard;
-import com.stark.studentmanagement.entity.Fee;
-import com.stark.studentmanagement.entity.User;
-import com.stark.studentmanagement.repository.AdmitCardRepository;
-import com.stark.studentmanagement.repository.FeeRepository;
-import com.stark.studentmanagement.repository.UserRepository;
+import com.stark.studentmanagement.entity.*;
+import com.stark.studentmanagement.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +24,20 @@ public class UserService {
     
     @Autowired
     private FeeRepository feeRepository;
+
+    @Autowired
+    private AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private GrievanceRepository grievanceRepository;
+
+    @Autowired
+    private ResultRepository resultRepository;
+
+    @Autowired
+    private SubmissionRepository submissionRepository;
     
+    @Transactional
     public User registerUser(User user) {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new RuntimeException("Username already exists");
@@ -71,6 +81,7 @@ public class UserService {
         return userRepository.findByRole(role);
     }
     
+    @Transactional
     public User saveUser(User user) {
         // Only encode password if it's a new user or password is being changed
         if (user.getId() == null || (user.getPassword() != null && !user.getPassword().isEmpty() && !user.getPassword().startsWith("$2a$"))) {
@@ -88,7 +99,31 @@ public class UserService {
                 .collect(java.util.stream.Collectors.toList());
     }
     
+    @Transactional
     public void deleteUser(Long id) {
+        admitCardRepository.findByStudentId(id).ifPresent(admitCardRepository::delete);
+        feeRepository.findByStudentId(id).ifPresent(feeRepository::delete);
+
+        List<Attendance> attList = attendanceRepository.findByStudentId(id);
+        if (attList != null && !attList.isEmpty()) {
+            attendanceRepository.deleteAll(attList);
+        }
+
+        List<Grievance> gList = grievanceRepository.findByStudentId(id);
+        if (gList != null && !gList.isEmpty()) {
+            grievanceRepository.deleteAll(gList);
+        }
+
+        List<Result> rList = resultRepository.findByStudentId(id);
+        if (rList != null && !rList.isEmpty()) {
+            resultRepository.deleteAll(rList);
+        }
+
+        List<Submission> sList = submissionRepository.findByStudentId(id);
+        if (sList != null && !sList.isEmpty()) {
+            submissionRepository.deleteAll(sList);
+        }
+
         userRepository.deleteById(id);
     }
 }

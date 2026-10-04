@@ -36,6 +36,10 @@
             <p style="color: var(--text-light); font-size: 0.9rem;">Generate QR codes or manually mark student attendance</p>
         </div>
 
+        <div th:if="${successMessage}" style="margin-bottom: 1.5rem; padding: 1rem; background-color: #d1fae5; color: #065f46; border-radius: 6px; border-left: 4px solid #10b981; font-weight: 500;">
+            <span th:text="${successMessage}"></span>
+        </div>
+
         <div style="margin-bottom: 2rem;">
             <button onclick="showQRMode()" class="btn btn-primary" id="qrModeBtn">QR Code Mode</button>
             <button onclick="showManualMode()" class="btn btn-outline" id="manualModeBtn">Manual Mode</button>
@@ -114,9 +118,13 @@
                 </div>
                 <div class="card-body">
                     <form th:action="@{/teacher/mark-attendance/manual}" method="post">
+                        <input type="hidden" name="department" th:value="${selectedDept}">
+                        <input type="hidden" name="section" th:value="${selectedSection}">
+                        <input type="hidden" name="year" th:value="${selectedYear}">
+
                         <div class="form-group" style="margin-bottom: 1.5rem; max-width: 300px;">
                             <label for="attendanceDate" style="font-weight: 600;">Attendance Date</label>
-                            <input type="date" id="attendanceDate" name="date" class="form-control" th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+                            <input type="date" id="attendanceDate" name="date" class="form-control" th:value="${selectedDate != null ? selectedDate : #temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required onchange="document.getElementById('filterForm').dateStr.value=this.value; document.getElementById('filterForm').submit();">
                         </div>
 
                         <table class="table">
@@ -139,11 +147,13 @@
                                     <td th:text="${'Yr ' + student.year}"></td>
                                     <td style="font-weight: 700;" th:text="${student.section}"></td>
                                     <td>
-                                        <input type="radio" th:name="'attendance[' + ${student.id} + ']'" th:id="'present_' + ${student.id}" value="PRESENT" checked>
+                                        <input type="radio" th:name="'attendance[' + ${student.id} + ']'" th:id="'present_' + ${student.id}" value="PRESENT"
+                                               th:checked="${attendanceStatusMap == null or attendanceStatusMap.get(student.id) == null or attendanceStatusMap.get(student.id) == T(com.stark.studentmanagement.entity.Attendance.AttendanceStatus).PRESENT}">
                                         <label th:for="'present_' + ${student.id}">Present</label>
                                     </td>
                                     <td>
-                                        <input type="radio" th:name="'attendance[' + ${student.id} + ']'" th:id="'absent_' + ${student.id}" value="ABSENT">
+                                        <input type="radio" th:name="'attendance[' + ${student.id} + ']'" th:id="'absent_' + ${student.id}" value="ABSENT"
+                                               th:checked="${attendanceStatusMap != null and attendanceStatusMap.get(student.id) == T(com.stark.studentmanagement.entity.Attendance.AttendanceStatus).ABSENT}">
                                         <label th:for="'absent_' + ${student.id}">Absent</label>
                                     </td>
                                 </tr>
@@ -168,7 +178,7 @@
         </div>
     </footer>
     
-    <script>
+    <script th:inline="javascript">
         let refreshInterval;
 
         function showQRMode() {
@@ -200,11 +210,27 @@
             alert('Attendance stopped');
         }
 
-        // Refresh QR code every 10 seconds
-        refreshInterval = setInterval(refreshQRCode, 10000);
+        // Scroll Restoration
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('scrollPos_' + window.location.pathname, window.scrollY);
+        });
 
-        // Initial load
-        refreshQRCode();
+        document.addEventListener('DOMContentLoaded', () => {
+            const scrollPos = sessionStorage.getItem('scrollPos_' + window.location.pathname);
+            if (scrollPos !== null) {
+                window.scrollTo(0, parseInt(scrollPos, 10));
+                sessionStorage.removeItem('scrollPos_' + window.location.pathname);
+            }
+
+            /*[[${successMessage != null or selectedDept != null or selectedSection != null or selectedYear != null}]]*/
+            var isManual = /*[[${successMessage != null or selectedDept != null or selectedSection != null or selectedYear != null}]]*/ false;
+            if (isManual) {
+                showManualMode();
+            } else {
+                refreshQRCode();
+                refreshInterval = setInterval(refreshQRCode, 10000);
+            }
+        });
     </script>
 </body>
 </html>

@@ -43,6 +43,10 @@
             <p style="color: var(--text-light); font-size: 0.9rem;">Resolve student grievances</p>
         </div>
         
+        <div th:if="${successMessage}" style="margin-bottom: 1.5rem; padding: 1rem; background-color: #d1fae5; color: #065f46; border-radius: 6px; border-left: 4px solid #10b981; font-weight: 500;">
+            <span th:text="${successMessage}"></span>
+        </div>
+
         <div class="card">
             <div class="card-header">
                 <h3>Pending Grievances</h3>
@@ -65,7 +69,14 @@
                             <td th:text="${grievance.description}"></td>
                             <td th:text="${grievance.status}"></td>
                             <td>
-                                <a th:href="@{/admin/grievances/{id}/resolve(id=${grievance.id})}" class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;">Resolve</a>
+                                <form th:action="@{/admin/grievances/{id}/resolve(id=${grievance.id})}" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;">Resolve</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${grievances == null or grievances.empty}">
+                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-light);">
+                                No pending grievances found.
                             </td>
                         </tr>
                     </tbody>
@@ -79,5 +90,19 @@
             <p>&copy; 2024 Student Management System. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+        // Scroll Position Preservation
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('scrollPos_' + window.location.pathname, window.scrollY);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const scrollPos = sessionStorage.getItem('scrollPos_' + window.location.pathname);
+            if (scrollPos !== null) {
+                window.scrollTo(0, parseInt(scrollPos, 10));
+                sessionStorage.removeItem('scrollPos_' + window.location.pathname);
+            }
+        });
+    </script>
 </body>
 </html>

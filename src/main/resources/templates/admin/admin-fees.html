@@ -272,6 +272,19 @@
     </footer>
 
     <script>
+        // Scroll Position Preservation
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('scrollPos_' + window.location.pathname, window.scrollY);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const scrollPos = sessionStorage.getItem('scrollPos_' + window.location.pathname);
+            if (scrollPos !== null) {
+                window.scrollTo(0, parseInt(scrollPos, 10));
+                sessionStorage.removeItem('scrollPos_' + window.location.pathname);
+            }
+        });
+
         function openAddModal() {
             document.getElementById('addFeeModal').classList.add('active');
         }

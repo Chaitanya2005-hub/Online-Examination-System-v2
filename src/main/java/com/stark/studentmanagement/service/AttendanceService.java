@@ -7,11 +7,13 @@ import com.stark.studentmanagement.repository.AttendanceRepository;
 import com.stark.studentmanagement.repository.LiveCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class AttendanceService {
     
     @Autowired
