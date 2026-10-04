@@ -94,7 +94,8 @@ src/app/
         ├── schedule-exam/
         ├── manage-admit-cards/ (Block/Release Status Toggle & Badges)
         ├── admin-fees/ (Edit Amount & Approve/Disapprove Controls)
-        └── manage-subjects/
+        ├── manage-subjects/
+        └── live-monitoring/ (Live WebCam Stream & Anti-Cheat Proctoring Grid Dashboard)
 ```
 
 ---
@@ -117,6 +118,7 @@ src/app/
 ### Primary REST API Endpoints
 - **Auth**: `POST /api/auth/login`, `GET /api/auth/me`
 - **Exams**: `GET /api/exams`, `POST /api/exams/schedule`, `GET /api/exams/:id/questions`, `POST /api/exams/:id/submit`
+- **Live WebCam Proctoring & Monitoring**: `POST /api/proctor/stream` (Receives WebCam frames/status), `GET /api/proctor/active-sessions` (Retrieves active student video streams & warnings)
 - **Gemini AI**: `POST /api/teacher/auto-generate-questions`
 - **Attendance**: `GET /api/teacher/qr-code` (PNG byte stream), `POST /api/student/attendance/mark`
 - **Admit Cards**: `GET /api/admin/admit-cards`, `POST /api/admin/admit-cards/:studentId/status`
@@ -126,13 +128,19 @@ src/app/
 
 ## 🔑 Key Operational & Implementation Rules
 
-### 1. 🛡️ Anti-Cheat & Proctoring Engine (`exam-interface.component.ts`)
-- Attach Angular `@HostListener('window:blur')` and `document.addEventListener('visibilitychange')`.
-- Maintain a `warningCount` Signal/variable:
-  - **1st Tab Switch**: Display a modal dialog ("Warning: Do not switch tabs during examination").
-  - **2nd Tab Switch**: Display a high-priority alert.
-  - **3rd Tab Switch**: Force submit the current answers and record security violations in `Result.securityWarnings`.
-- Stream webcam feed locally using `navigator.mediaDevices.getUserMedia({ video: true })` and render inside a proctoring thumbnail container.
+### 1. 🛡️ Anti-Cheat & Live WebCam Proctoring Engine (`exam-interface.component.ts` & `live-monitoring.component.ts`)
+- **Student Exam Proctoring**:
+  - Attach Angular `@HostListener('window:blur')` and `document.addEventListener('visibilitychange')`.
+  - Maintain a `warningCount` Signal/variable:
+    - **1st Tab Switch**: Display a modal warning ("Warning: Do not switch tabs during examination").
+    - **2nd Tab Switch**: Display a high-priority warning banner.
+    - **3rd Tab Switch**: Force submit current answers and record security violations in `Result.securityWarnings`.
+  - Capture local WebCam feed via `navigator.mediaDevices.getUserMedia({ video: true })` and render inside a proctoring thumbnail container.
+  - Periodically push live WebCam frame snapshots and warning logs to `POST /api/proctor/stream`.
+- **Admin & Faculty Live Monitoring Dashboard (`live-monitoring.component.ts` / `live-proctoring.component.ts`)**:
+  - Displays a grid of live student video streams and real-time proctoring status cards.
+  - Highlights red warning badges for students with tab-switch violations (`warningCount > 0`).
+  - Allows Admin & Faculty to inspect live WebCam feeds, view exam progress, and flag suspicious activities.
 
 ### 2. 🤖 Gemini AI Question Generator (`upload-questions.component.ts`)
 - Form inputs: `examId`, `count`, `topicFocus`, `difficultyLevel`.
