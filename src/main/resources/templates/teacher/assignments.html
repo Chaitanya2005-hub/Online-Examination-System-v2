@@ -32,8 +32,11 @@
     <main class="container" style="padding-top: 2rem;">
         <div style="margin-bottom: 2rem;">
             <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Manage Assignments</h1>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Create and manage assignments</p>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Create assignments and review student submissions</p>
         </div>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}" style="margin-bottom: 1rem;"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}" style="margin-bottom: 1rem;"></div>
         
         <div class="card">
             <div class="card-header">
@@ -69,6 +72,8 @@
                             <th>Title</th>
                             <th>Description</th>
                             <th>Due Date</th>
+                            <th>Submissions</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,6 +81,16 @@
                             <td th:text="${assignment.title}"></td>
                             <td th:text="${assignment.description}"></td>
                             <td th:text="${assignment.dueDate}"></td>
+                            <td>
+                                <span class="badge" style="background: var(--primary-color, #2563eb); color: #fff; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem;"
+                                      th:text="${submissionCounts != null ? submissionCounts[assignment.id] : 0} + ' submitted'">0 submitted</span>
+                            </td>
+                            <td style="white-space: nowrap;">
+                                <a th:href="@{/teacher/assignments/{id}/submissions(id=${assignment.id})}" class="btn btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">View Submissions</a>
+                                <form th:action="@{/teacher/assignments/delete/{id}(id=${assignment.id})}" method="post" style="display: inline; margin-left: 0.4rem;" onsubmit="return confirm('Delete this assignment and all its submissions?');">
+                                    <button type="submit" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; color: #dc2626; border-color: #dc2626;">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

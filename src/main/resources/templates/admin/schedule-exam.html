@@ -40,8 +40,11 @@
     <main class="container" style="padding-top: 2rem;">
         <div style="margin-bottom: 2rem;">
             <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Schedule Exam</h1>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Create and schedule examinations</p>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Create, view, and manage scheduled examinations</p>
         </div>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}" style="margin-bottom: 1rem;"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}" style="margin-bottom: 1rem;"></div>
         
         <div class="card" style="max-width: 600px;">
             <div class="card-header">
@@ -54,6 +57,13 @@
                         <input type="text" id="title" th:field="*{title}" class="form-control" required>
                     </div>
                     <div class="form-group">
+                        <label for="subjectId">Subject</label>
+                        <select id="subjectId" name="subjectId" class="form-control">
+                            <option value="">-- Select Subject (Optional) --</option>
+                            <option th:each="sub : ${subjects}" th:value="${sub.id}" th:text="${sub.code + ' - ' + sub.name}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="examDate">Exam Date</label>
                         <input type="date" id="examDate" th:field="*{examDate}" class="form-control" required>
                     </div>
@@ -63,10 +73,49 @@
                     </div>
                     <div class="form-group">
                         <label for="durationMinutes">Duration (minutes)</label>
-                        <input type="number" id="durationMinutes" th:field="*{durationMinutes}" class="form-control" required>
+                        <input type="number" id="durationMinutes" th:field="*{durationMinutes}" class="form-control" min="5" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Schedule Exam</button>
                 </form>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+                <h3>Scheduled Exams (<span th:text="${#lists.size(exams)}">0</span>)</h3>
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(exams)}" style="color: var(--text-light); text-align: center; padding: 1.5rem;">
+                    No exams scheduled yet.
+                </div>
+                <table class="table" th:if="${!#lists.isEmpty(exams)}">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Start Time</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="ex : ${exams}">
+                            <td style="font-weight: 600;" th:text="${ex.title}"></td>
+                            <td th:text="${ex.subject != null ? ex.subject.code + ' - ' + ex.subject.name : '-'}"></td>
+                            <td th:text="${ex.examDate}"></td>
+                            <td th:text="${ex.startTime}"></td>
+                            <td th:text="${ex.durationMinutes + ' mins'}"></td>
+                            <td th:text="${ex.status}"></td>
+                            <td>
+                                <form th:action="@{/admin/schedule-exam/delete/{id}(id=${ex.id})}" method="post" style="display: inline;" onsubmit="return confirm('Delete this scheduled exam and its questions?');">
+                                    <button type="submit" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; color: #dc2626; border-color: #dc2626;">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>

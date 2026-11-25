@@ -30,37 +30,66 @@
     </header>
     
     <main class="container" style="padding-top: 2rem;">
-        <div style="margin-bottom: 2rem;">
-            <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Student Progress</h1>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Track student performance</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Student Progress</h1>
+                <p style="color: var(--text-light); font-size: 0.9rem;">Track student exam performance and attendance metrics</p>
+            </div>
+            <input type="text" id="studentSearch" class="form-control" placeholder="Search by name, ERP ID, or department..." style="max-width: 300px;" oninput="filterStudents()">
         </div>
         
         <div class="card">
             <div class="card-header">
-                <h3>All Students</h3>
+                <h3>All Students (<span th:text="${#lists.size(progressList)}">0</span>)</h3>
             </div>
             <div class="card-body">
-                <table class="table">
+                <table class="table" id="progressTable">
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>ERP ID</th>
                             <th>Department</th>
-                            <th>Year</th>
-                            <th>Section</th>
+                            <th>Year / Sec</th>
+                            <th>Exams Taken</th>
+                            <th>Avg Score</th>
+                            <th>Attendance</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="student : ${students}">
-                            <td th:text="${student.fullName}"></td>
-                            <td th:text="${student.department}"></td>
-                            <td th:text="${student.year}"></td>
-                            <td th:text="${student.section}"></td>
+                        <tr th:each="item : ${progressList}">
+                            <td th:text="${item.student.fullName}"></td>
+                            <td th:text="${item.student.erpId != null ? item.student.erpId : item.student.username}"></td>
+                            <td th:text="${item.student.department}"></td>
+                            <td th:text="${(item.student.year != null ? item.student.year : '-') + ' / ' + (item.student.section != null ? item.student.section : '-')}"></td>
+                            <td th:text="${item.examsTaken}">0</td>
+                            <td>
+                                <span th:if="${item.examsTaken > 0}" th:text="${item.avgScorePct + '%'}"
+                                      th:style="${item.avgScorePct >= 60 ? 'color: #16a34a; font-weight: 600;' : 'color: #dc2626; font-weight: 600;'}"></span>
+                                <span th:if="${item.examsTaken == 0}" style="color: var(--text-light);">No exams</span>
+                            </td>
+                            <td>
+                                <span th:if="${item.attendanceTotal > 0}"
+                                      th:text="${item.attendancePct + '% (' + item.attendancePresent + '/' + item.attendanceTotal + ')'}"
+                                      th:style="${item.attendancePct >= 75 ? 'color: #16a34a; font-weight: 600;' : 'color: #d97706; font-weight: 600;'}"></span>
+                                <span th:if="${item.attendanceTotal == 0}" style="color: var(--text-light);">No records</span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
+
+    <script>
+        function filterStudents() {
+            const query = document.getElementById('studentSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#progressTable tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+    </script>
     
     <footer>
         <div class="container">

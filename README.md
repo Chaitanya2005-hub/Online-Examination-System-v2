@@ -74,16 +74,18 @@ The application follows a clean 3-Tier Enterprise MVC Architecture powered by Sp
 - **Official PDF Issuing**: Download printable PDF Admit Cards and Fee Payment Receipts generated via iText.
 
 ### 2. 👩‍🏫 Teacher Portal & AI Question Generation
-- **Google Gemini AI Question Bank Generator**: Teachers input a subject topic, question count, and difficulty level (`EASY`, `MEDIUM`, `HARD`). The system calls the Google Gemini API (v1beta) to generate structured JSON MCQs and saves them directly to the database. Includes a built-in smart fallback generator if the API key is not configured.
+- **Google Gemini AI Question Bank Generator**: Teachers input a subject topic, question count, difficulty level (`EASY`, `MEDIUM`, `HARD`), and an optional custom API key. The system calls the Google Gemini API (v1beta) with automatic model fallbacks to generate structured JSON MCQs and saves them directly to the database. Includes a built-in smart fallback generator if the API key is not configured.
 - **Live WebCam Proctoring Feed**: Faculty members monitor active webcam streams and anti-cheat alerts for all participating students in real time.
 - **Dynamic QR Attendance Host**: Generates auto-refreshing QR codes (refreshed every 10 seconds with a 60-second validity window) using ZXing engine.
-- **Assignment & Grade Management**: Create assignments, grade student submissions, and review student progress analytics.
+- **Assignment & Submission Management**: Create assignments, track submission counts, inspect individual student submissions, and delete assignments.
+- **Student Progress Analytics**: View per-student exam count, average score percentage, and attendance percentage with instant search filtering.
 
 ### 3. 🛡️ Admin (Author) Portal & Academic Control
 - **User & Subject Directory**: Comprehensive CRUD management for students, faculty, and subject catalogs.
+- **Live Proctoring Monitoring**: Real-time admin dashboard view (`/admin/live-monitoring`) for active webcam streams and anti-cheat violation logs.
 - **Admit Card Management**: Control student exam eligibility with instant `RELEASED` / `BLOCKED` status switches and visual status badges.
 - **Fee Management & Approvals**: Assign tuition fees, edit payment records, and execute administrative `APPROVED` or `DISAPPROVED` status verifications.
-- **Notices & Exam Timetables**: Broadcast university-wide announcements and schedule semester examination timetables.
+- **Notices & Exam Timetables**: Broadcast, review, and delete university-wide announcements; schedule semester exams linked to subjects and manage/delete scheduled exams.
 
 ---
 

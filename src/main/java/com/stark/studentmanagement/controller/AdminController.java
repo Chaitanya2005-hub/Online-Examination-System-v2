@@ -95,14 +95,35 @@ public class AdminController {
         
         List<com.stark.studentmanagement.entity.Subject> subjects = subjectService.getAllSubjects();
         model.addAttribute("subjects", subjects);
+        model.addAttribute("exams", examService.getAllExams());
         model.addAttribute("exam", new Exam());
         
         return "admin/schedule-exam";
     }
     
     @PostMapping("/schedule-exam")
-    public String saveExam(@ModelAttribute Exam exam) {
+    public String saveExam(@ModelAttribute Exam exam,
+                           @RequestParam(value = "subjectId", required = false) Long subjectId,
+                           org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (subjectId != null) {
+            subjectService.getSubjectById(subjectId).ifPresent(exam::setSubject);
+        }
+        if (exam.getStatus() == null) {
+            exam.setStatus(Exam.ExamStatus.SCHEDULED);
+        }
         examService.saveExam(exam);
+        redirectAttributes.addFlashAttribute("successMessage", "Exam '" + exam.getTitle() + "' scheduled successfully!");
+        return "redirect:/admin/schedule-exam";
+    }
+
+    @PostMapping("/schedule-exam/delete/{id}")
+    public String deleteExam(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            examService.deleteExam(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Scheduled exam deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Cannot delete exam (it may have submitted results): " + e.getMessage());
+        }
         return "redirect:/admin/schedule-exam";
     }
     
@@ -113,16 +134,29 @@ public class AdminController {
         model.addAttribute("title", "Post Notice");
         model.addAttribute("theme", "theme-admin");
         model.addAttribute("notice", new Notice());
+        model.addAttribute("notices", noticeService.getAllNotices());
         
         return "admin/post-notice";
     }
     
     @PostMapping("/post-notice")
-    public String saveNotice(@ModelAttribute Notice notice, Authentication authentication) {
+    public String saveNotice(@ModelAttribute Notice notice, Authentication authentication, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         User user = userService.findByUsername(authentication.getName());
         notice.setPostedBy(user);
         notice.setPostedDate(java.time.LocalDateTime.now());
         noticeService.saveNotice(notice);
+        redirectAttributes.addFlashAttribute("successMessage", "Notice published successfully!");
+        return "redirect:/admin/post-notice";
+    }
+
+    @PostMapping("/post-notice/delete/{id}")
+    public String deleteNotice(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            noticeService.deleteNotice(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Notice deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete notice: " + e.getMessage());
+        }
         return "redirect:/admin/post-notice";
     }
     

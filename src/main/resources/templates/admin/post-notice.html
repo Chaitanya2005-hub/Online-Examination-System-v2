@@ -40,8 +40,11 @@
     <main class="container" style="padding-top: 2rem;">
         <div style="margin-bottom: 2rem;">
             <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Post Notice</h1>
-            <p style="color: var(--text-light); font-size: 0.9rem;">Announce to all users</p>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Announce to all users and manage published notices</p>
         </div>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}" style="margin-bottom: 1rem;"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}" style="margin-bottom: 1rem;"></div>
         
         <div class="card" style="max-width: 600px;">
             <div class="card-header">
@@ -59,6 +62,41 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Post Notice</button>
                 </form>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <div class="card-header">
+                <h3>Published Notices (<span th:text="${#lists.size(notices)}">0</span>)</h3>
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(notices)}" style="color: var(--text-light); text-align: center; padding: 1.5rem;">
+                    No notices published yet.
+                </div>
+                <table class="table" th:if="${!#lists.isEmpty(notices)}">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Message</th>
+                            <th>Posted By</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="n : ${notices}">
+                            <td style="font-weight: 600;" th:text="${n.title}"></td>
+                            <td style="max-width: 400px;" th:text="${n.message}"></td>
+                            <td th:text="${n.postedBy != null ? n.postedBy.fullName : 'Admin'}"></td>
+                            <td th:text="${n.postedDate != null ? #temporals.format(n.postedDate, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+                            <td>
+                                <form th:action="@{/admin/post-notice/delete/{id}(id=${n.id})}" method="post" style="display: inline;" onsubmit="return confirm('Delete this notice?');">
+                                    <button type="submit" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; color: #dc2626; border-color: #dc2626;">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>

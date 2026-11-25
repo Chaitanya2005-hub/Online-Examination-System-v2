@@ -336,18 +336,24 @@ public class TeacherController {
         model.addAttribute("theme", "theme-teacher");
         
         List<Assignment> assignments = assignmentService.getAssignmentsByTeacher(user.getId());
+        Map<Long, Integer> submissionCounts = new java.util.HashMap<>();
+        for (Assignment a : assignments) {
+            submissionCounts.put(a.getId(), assignmentService.getSubmissionsByAssignmentId(a.getId()).size());
+        }
         model.addAttribute("assignments", assignments);
+        model.addAttribute("submissionCounts", submissionCounts);
         model.addAttribute("assignment", new Assignment());
         
         return "teacher/assignments";
     }
     
     @PostMapping("/assignments")
-    public String createAssignment(@ModelAttribute Assignment assignment, Authentication authentication, Model model) {
+    public String createAssignment(@ModelAttribute Assignment assignment, Authentication authentication, RedirectAttributes redirectAttributes, Model model) {
         try {
             User user = userService.findByUsername(authentication.getName());
             assignment.setCreatedBy(user);
             assignmentService.saveAssignment(assignment);
+            redirectAttributes.addFlashAttribute("success", "Assignment created successfully.");
             return "redirect:/teacher/assignments";
         } catch (Exception e) {
             User user = userService.findByUsername(authentication.getName());
@@ -360,6 +366,35 @@ public class TeacherController {
             return "teacher/assignments";
         }
     }
+
+    @GetMapping("/assignments/{id}/submissions")
+    public String viewAssignmentSubmissions(@PathVariable Long id, Authentication authentication, RedirectAttributes redirectAttributes, Model model) {
+        User user = userService.findByUsername(authentication.getName());
+        Assignment assignment = assignmentService.getAssignmentById(id);
+        if (assignment == null || assignment.getCreatedBy() == null || !assignment.getCreatedBy().getId().equals(user.getId())) {
+            redirectAttributes.addFlashAttribute("error", "Assignment not found or access denied.");
+            return "redirect:/teacher/assignments";
+        }
+        model.addAttribute("user", user);
+        model.addAttribute("title", "Assignment Submissions");
+        model.addAttribute("theme", "theme-teacher");
+        model.addAttribute("assignment", assignment);
+        model.addAttribute("submissions", assignmentService.getSubmissionsByAssignmentId(id));
+        return "teacher/assignment-submissions";
+    }
+
+    @PostMapping("/assignments/delete/{id}")
+    public String deleteAssignment(@PathVariable Long id, Authentication authentication, RedirectAttributes redirectAttributes) {
+        User user = userService.findByUsername(authentication.getName());
+        Assignment assignment = assignmentService.getAssignmentById(id);
+        if (assignment == null || assignment.getCreatedBy() == null || !assignment.getCreatedBy().getId().equals(user.getId())) {
+            redirectAttributes.addFlashAttribute("error", "Assignment not found or access denied.");
+            return "redirect:/teacher/assignments";
+        }
+        assignmentService.deleteAssignment(id);
+        redirectAttributes.addFlashAttribute("success", "Assignment deleted successfully.");
+        return "redirect:/teacher/assignments";
+    }
     
     @GetMapping("/student-progress")
     public String studentProgress(Authentication authentication, Model model) {
@@ -369,7 +404,41 @@ public class TeacherController {
         model.addAttribute("theme", "theme-teacher");
 
         List<User> students = userService.findByRole(User.Role.STUDENT);
+        List<Map<String, Object>> progressList = new java.util.ArrayList<>();
+        for (User student : students) {
+            List<Result> results = resultService.getResultsByStudentId(student.getId());
+            int examsTaken = results.size();
+            double avgScorePct = 0.0;
+            if (examsTaken > 0) {
+                double totalPct = 0.0;
+                for (Result r : results) {
+                    if (r.getTotalMarks() != null && r.getTotalMarks() > 0 && r.getScore() != null) {
+                        totalPct += (r.getScore() * 100.0) / r.getTotalMarks();
+                    }
+                }
+                avgScorePct = Math.round((totalPct / examsTaken) * 10.0) / 10.0;
+            }
+
+            List<Attendance> attendanceRecords = attendanceService.getAttendanceByStudentId(student.getId());
+            int totalClasses = attendanceRecords.size();
+            long presentCount = attendanceRecords.stream()
+                    .filter(a -> a.getStatus() == Attendance.AttendanceStatus.PRESENT)
+                    .count();
+            double attendancePct = totalClasses > 0
+                    ? Math.round(((presentCount * 100.0) / totalClasses) * 10.0) / 10.0
+                    : 0.0;
+
+            Map<String, Object> row = new java.util.HashMap<>();
+            row.put("student", student);
+            row.put("examsTaken", examsTaken);
+            row.put("avgScorePct", avgScorePct);
+            row.put("attendancePresent", presentCount);
+            row.put("attendanceTotal", totalClasses);
+            row.put("attendancePct", attendancePct);
+            progressList.add(row);
+        }
         model.addAttribute("students", students);
+        model.addAttribute("progressList", progressList);
 
         return "teacher/student-progress";
     }
